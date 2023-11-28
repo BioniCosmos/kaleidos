@@ -1,6 +1,6 @@
 import { defineRoute } from '$fresh/server.ts'
 import { join } from '$std/path/mod.ts'
-import { db, Image } from '../../db.ts'
+import { db, Image, Album } from '../../db.ts'
 
 export default defineRoute((_req, ctx) => {
   const { id } = ctx.params
@@ -12,13 +12,19 @@ export default defineRoute((_req, ctx) => {
   if (image === undefined) {
     return ctx.renderNotFound()
   }
+
+  const albumName = db.queryEntries<Pick<Album, 'name'>>(
+    'SELECT name from albums where id = ?',
+    [image.albumId]
+  )[0].name
+
   return (
     <>
       <img src={join('/images', image.path)} />
       <h2>{image.name}</h2>
       <ul>
         <li>Date: {new Date(image.date).toLocaleString()}</li>
-        <li>Album: {image.albumId}</li>
+        <li>Album: {albumName}</li>
         <li>User: {image.userId}</li>
       </ul>
     </>

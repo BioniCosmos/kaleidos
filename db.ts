@@ -11,6 +11,12 @@ export type Image = {
   path: string
 }
 
+export type Album = {
+  id?: number
+  name: string
+  userId: number
+}
+
 export const db = new DB('./kaleidos.db')
 
 db.execute(`
@@ -23,5 +29,13 @@ db.execute(`
     userId INT NOT NULL,
     albumId INT NOT NULL,
     path TEXT NOT NULL
+  )
+`)
+
+db.execute(`
+  CREATE TABLE IF NOT EXISTS albums (
+    id INT PRIMARY KEY NOT NULL,
+    name TEXT NOT NULL,
+    userId INT NOT NULL
   )
 `)
