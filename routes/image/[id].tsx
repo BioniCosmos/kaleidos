@@ -1,13 +1,10 @@
 import { defineRoute } from '$fresh/server.ts'
 import { join } from '$std/path/mod.ts'
-import { db, Image, Album } from '../../db.ts'
+import { Album, Image, db } from '../../db.ts'
 
 export default defineRoute((_req, ctx) => {
-  const { id } = ctx.params
   const image = db
-    .queryEntries<Image>('SELECT * FROM images WHERE id = :id', {
-      id,
-    })
+    .queryEntries<Image>('SELECT * FROM images WHERE id = :id', ctx.params)
     .at(0)
   if (image === undefined) {
     return ctx.renderNotFound()
@@ -20,7 +17,9 @@ export default defineRoute((_req, ctx) => {
 
   return (
     <>
-      <img src={join('/images', image.path)} />
+      <a href={join('/images', image.path)}>
+        <img src={join('/images', image.path)} />
+      </a>
       <h2>{image.name}</h2>
       <ul>
         <li>Date: {new Date(image.date).toLocaleString()}</li>

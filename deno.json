@@ -20,6 +20,11 @@
     "twind/": "https://esm.sh/twind@0.16.19/",
     "$std/": "https://deno.land/std@0.193.0/"
   },
-  "compilerOptions": { "jsx": "react-jsx", "jsxImportSource": "preact" },
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact",
+    "noUnusedLocals": true,
+    "noUnusedParameters": true
+  },
   "fmt": { "singleQuote": true, "semiColons": false }
 }

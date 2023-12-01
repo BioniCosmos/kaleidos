@@ -10,5 +10,6 @@ _fresh/
 
 .DS_Store
 *.db
+*.db-journal
 images
 migration.ts
