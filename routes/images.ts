@@ -1,6 +1,6 @@
-import { RouteConfig, defineRoute } from '$fresh/server.ts'
-import { join, extname } from '$std/path/mod.ts'
+import { defineRoute, type RouteConfig } from '$fresh/server.ts'
 import { contentType } from '$std/media_types/mod.ts'
+import { extname, join } from '$std/path/mod.ts'
 
 export const config: RouteConfig = {
   routeOverride: '/images/:year/:month/:day/:name',

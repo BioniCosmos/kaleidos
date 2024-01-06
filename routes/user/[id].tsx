@@ -1,5 +1,5 @@
 import { defineRoute } from '$fresh/server.ts'
-import { Album, User, db } from '../../db.ts'
+import { db, type Album, type User } from '../../db.ts'
 
 export default defineRoute((_req, ctx) => {
   const user = db

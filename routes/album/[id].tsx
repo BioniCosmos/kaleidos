@@ -1,6 +1,6 @@
 import { defineRoute } from '$fresh/server.ts'
 import { join } from '$std/path/mod.ts'
-import { Album, db, Image } from '../../db.ts'
+import { db, type Album, type Image } from '../../db.ts'
 
 export default defineRoute((_req, ctx) => {
   const album = db
