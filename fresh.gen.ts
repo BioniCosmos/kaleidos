@@ -3,20 +3,26 @@
 // This file is automatically updated during development when running `dev.ts`.
 
 import * as $_app from "./routes/_app.tsx";
+import * as $_middleware from "./routes/_middleware.tsx";
 import * as $album_id_ from "./routes/album/[id].tsx";
+import * as $error from "./routes/error.tsx";
 import * as $image_id_ from "./routes/image/[id].tsx";
 import * as $images from "./routes/images.ts";
-import * as $user_id_ from "./routes/user/[id].tsx";
+import * as $index from "./routes/index.tsx";
+import * as $login from "./routes/login.tsx";
 
 import { type Manifest } from "$fresh/server.ts";
 
 const manifest = {
   routes: {
     "./routes/_app.tsx": $_app,
+    "./routes/_middleware.tsx": $_middleware,
     "./routes/album/[id].tsx": $album_id_,
+    "./routes/error.tsx": $error,
     "./routes/image/[id].tsx": $image_id_,
     "./routes/images.ts": $images,
-    "./routes/user/[id].tsx": $user_id_,
+    "./routes/index.tsx": $index,
+    "./routes/login.tsx": $login,
   },
   islands: {},
   baseUrl: import.meta.url,

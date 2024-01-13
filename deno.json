@@ -1,7 +1,7 @@
 {
   "lock": false,
   "tasks": {
-    "check": "deno lint && deno check **/*.ts && deno check **/*.tsx",
+    "check": "deno lint --ignore=argon2/wasm_exec.js && deno check **/*.ts && deno check **/*.tsx",
     "cli": "echo \"import '\\$fresh/src/dev/cli.ts'\" | deno run --unstable -A -",
     "manifest": "deno task cli manifest $(pwd)",
     "start": "deno run -A --watch=static/,routes/ dev.ts",
@@ -24,7 +24,9 @@
     "tailwindcss": "npm:tailwindcss@3.3.5",
     "tailwindcss/": "npm:/tailwindcss@3.3.5/",
     "tailwindcss/plugin": "npm:/tailwindcss@3.3.5/plugin.js",
-    "$std/": "https://deno.land/std@0.208.0/"
+    "$std/": "https://deno.land/std@0.208.0/",
+    "sqlite": "https://deno.land/x/sqlite@v3.8/mod.ts",
+    "argon2": "./argon2/mod.ts"
   },
   "compilerOptions": {
     "jsx": "react-jsx",

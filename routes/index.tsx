@@ -1,9 +1,11 @@
 import { defineRoute } from '$fresh/server.ts'
-import { db, type Album, type User } from '../../db.ts'
+import { db, type Album, type User } from '../db.ts'
+import type { State } from './_middleware.tsx'
 
-export default defineRoute((_req, ctx) => {
+export default defineRoute<State>((_req, ctx) => {
+  const { userId: id } = ctx.state
   const user = db
-    .queryEntries<User>('SELECT * FROM users WHERE id = :id', ctx.params)
+    .queryEntries<User>('SELECT * FROM users WHERE id = :id', { id })
     .at(0)
   if (user === undefined) {
     return ctx.renderNotFound()

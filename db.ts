@@ -1,4 +1,4 @@
-import { DB } from 'https://deno.land/x/sqlite@v3.8/mod.ts'
+import { DB } from 'sqlite'
 
 export type Image = {
   id?: number
@@ -19,13 +19,13 @@ export type Album = {
 
 export type User = {
   id?: string
+  password: string
   name: string
   isAdmin: boolean
 }
 
-export const db = new DB('./kaleidos.db')
-
-db.execute(`
+export function createImageTable(db: DB) {
+  db.execute(`
   CREATE TABLE IF NOT EXISTS images (
     id INT PRIMARY KEY NOT NULL,
     name TEXT NOT NULL,
@@ -37,19 +37,31 @@ db.execute(`
     path TEXT NOT NULL
   )
 `)
+}
 
-db.execute(`
+export function createAlbumTable(db: DB) {
+  db.execute(`
   CREATE TABLE IF NOT EXISTS albums (
     id INT PRIMARY KEY NOT NULL,
     name TEXT NOT NULL,
     userId TEXT NOT NULL
   )
 `)
+}
 
-db.execute(`
+export function createUserTable(db: DB) {
+  db.execute(`
   CREATE TABLE IF NOT EXISTS users (
     id TEXT PRIMARY KEY NOT NULL,
+    password TEXT NOT NULL,
     name TEXT NOT NULL,
     isAdmin BOOL NOT NULL DEFAULT FALSE
   )
 `)
+}
+
+export const db = new DB('./kaleidos.db')
+
+createImageTable(db)
+createAlbumTable(db)
+createUserTable(db)
