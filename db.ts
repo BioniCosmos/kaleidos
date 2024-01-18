@@ -27,13 +27,13 @@ export type User = {
 export function createImageTable(db: DB) {
   db.execute(`
   CREATE TABLE IF NOT EXISTS images (
-    id INT PRIMARY KEY NOT NULL,
+    id INTEGER PRIMARY KEY NOT NULL,
     name TEXT NOT NULL,
     originName TEXT NOT NULL,
     extension TEXT NOT NULL,
-    date INT NOT NULL,
+    date INTEGER NOT NULL,
     userId TEXT NOT NULL,
-    albumId INT NOT NULL,
+    albumId INTEGER NOT NULL,
     path TEXT NOT NULL
   )
 `)
@@ -42,7 +42,7 @@ export function createImageTable(db: DB) {
 export function createAlbumTable(db: DB) {
   db.execute(`
   CREATE TABLE IF NOT EXISTS albums (
-    id INT PRIMARY KEY NOT NULL,
+    id INTEGER PRIMARY KEY NOT NULL,
     name TEXT NOT NULL,
     userId TEXT NOT NULL
   )
