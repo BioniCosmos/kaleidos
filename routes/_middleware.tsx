@@ -6,7 +6,11 @@ export interface State {
 }
 
 export async function handler(req: Request, ctx: FreshContext<State>) {
-  if (ctx.destination !== 'route' || ctx.route === '/error') {
+  if (
+    ctx.destination !== 'route' ||
+    ctx.route === '/error' ||
+    ctx.route.startsWith('/images/')
+  ) {
     return ctx.next()
   }
 

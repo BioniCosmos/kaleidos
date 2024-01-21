@@ -1,7 +1,9 @@
+import { join, parse } from '$std/path/mod.ts'
 import {
   SignJWT,
   jwtVerify as verify,
 } from 'https://deno.land/x/jose@v5.2.0/index.ts'
+import ShortUniqueId from 'https://esm.sh/short-unique-id@5.0.3'
 import type { User } from './db.ts'
 
 export function redirect(path: string) {
@@ -33,7 +35,7 @@ export async function jwtVerify(token: string) {
       return null
     }
     return sub
-  } catch (_error) {
+  } catch {
     return null
   }
 }
@@ -58,3 +60,34 @@ export function verifyToken(cookie: string | null) {
 
   return jwtVerify(token)
 }
+
+export function parseFileName(fileName: string) {
+  const { name, ext } = parse(fileName)
+  return { base: name, ext: ext.slice(1) }
+}
+
+export interface Timestamp {
+  year: string
+  month: string
+  day: string
+  time: number
+}
+
+export function getTime(date = new Date()): Timestamp {
+  const year = date.getFullYear().toString()
+  const month = (date.getMonth() + 1).toString().padStart(2, '0')
+  const day = date.getDate().toString().padStart(2, '0')
+  const time = date.getTime()
+  return { year, month, day, time }
+}
+
+export function getPath(fileName: string, { year, month, day } = getTime()) {
+  return join(year, month, day, fileName)
+}
+
+export function fileNameWithSuffix(fileName: string) {
+  const { base, ext } = parseFileName(fileName)
+  return `${base}-${randomId()}.${ext}`
+}
+
+export const randomId = new ShortUniqueId({ length: 10 }).randomUUID

@@ -3,8 +3,7 @@ import { DB } from 'sqlite'
 export type Image = {
   id?: number
   name: string
-  originName: string
-  extension: string
+  ext: string
   date: number
   userId: string
   albumId: number
@@ -29,8 +28,7 @@ export function createImageTable(db: DB) {
   CREATE TABLE IF NOT EXISTS images (
     id INTEGER PRIMARY KEY NOT NULL,
     name TEXT NOT NULL,
-    originName TEXT NOT NULL,
-    extension TEXT NOT NULL,
+    ext TEXT NOT NULL,
     date INTEGER NOT NULL,
     userId TEXT NOT NULL,
     albumId INTEGER NOT NULL,

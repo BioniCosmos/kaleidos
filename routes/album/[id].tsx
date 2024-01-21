@@ -19,6 +19,11 @@ export default defineRoute((_req, ctx) => {
     <>
       <h2>{album.name}</h2>
       <div>{images.length} image(s)</div>
+      <form method="post" action="/image/new" enctype="multipart/form-data">
+        <input name="imageFile" type="file" required />
+        <input name="albumId" type="hidden" value={album.id} />
+        <button>Upload</button>
+      </form>
       <div>
         {images.map((image) => (
           <a href={`/image/${image.id}`}>

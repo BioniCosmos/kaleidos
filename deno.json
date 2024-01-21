@@ -22,7 +22,8 @@
     "tailwindcss/plugin": "npm:/tailwindcss@3.3.5/plugin.js",
     "$std/": "https://deno.land/std@0.208.0/",
     "sqlite": "https://deno.land/x/sqlite@v3.8/mod.ts",
-    "argon2": "./argon2/mod.ts"
+    "argon2": "./argon2/mod.ts",
+    "sharp": "npm:sharp@0.33.2"
   },
   "compilerOptions": {
     "jsx": "react-jsx",
