@@ -22,7 +22,7 @@ export default defineRoute<State>((_req, ctx) => {
         <h2>{user.name}</h2>
         <h3>{user.id}</h3>
       </div>
-      <a href="/album/new">New album</a>
+      <a href="/album">New album</a>
       <div>
         {albums.map((album) => (
           <a href={`/album/${album.id}`}>{album.name}</a>
