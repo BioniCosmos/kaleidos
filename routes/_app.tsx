@@ -9,7 +9,7 @@ export default function App({ Component }: PageProps) {
         <title>Kaleidos</title>
         <link rel="stylesheet" href="/styles.css" />
       </head>
-      <body>
+      <body class="bg-gray-50">
         <Component />
       </body>
     </html>

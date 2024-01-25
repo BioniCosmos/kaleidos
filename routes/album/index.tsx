@@ -14,13 +14,3 @@ export const handler: Handlers<unknown, State> = {
     return redirect(`/album/${id}`)
   },
 }
-export default function AlbumNew() {
-  return (
-    <form method="post">
-      <label>
-        Name: <input name="name" required />
-      </label>
-      <button>Create</button>
-    </form>
-  )
-}

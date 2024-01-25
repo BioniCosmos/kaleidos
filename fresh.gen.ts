@@ -3,6 +3,7 @@
 // This file is automatically updated during development when running `dev.ts`.
 
 import * as $_app from "./routes/_app.tsx";
+import * as $_layout from "./routes/_layout.tsx";
 import * as $_middleware from "./routes/_middleware.tsx";
 import * as $album_id_ from "./routes/album/[id].tsx";
 import * as $album_index from "./routes/album/index.tsx";
@@ -12,12 +13,15 @@ import * as $image_index from "./routes/image/index.ts";
 import * as $images from "./routes/images.ts";
 import * as $index from "./routes/index.tsx";
 import * as $login from "./routes/login.tsx";
-
+import * as $Dialog from "./islands/Dialog.tsx";
+import * as $NewAlbum from "./islands/NewAlbum.tsx";
+import * as $UploadImage from "./islands/UploadImage.tsx";
 import { type Manifest } from "$fresh/server.ts";
 
 const manifest = {
   routes: {
     "./routes/_app.tsx": $_app,
+    "./routes/_layout.tsx": $_layout,
     "./routes/_middleware.tsx": $_middleware,
     "./routes/album/[id].tsx": $album_id_,
     "./routes/album/index.tsx": $album_index,
@@ -28,7 +32,11 @@ const manifest = {
     "./routes/index.tsx": $index,
     "./routes/login.tsx": $login,
   },
-  islands: {},
+  islands: {
+    "./islands/Dialog.tsx": $Dialog,
+    "./islands/NewAlbum.tsx": $NewAlbum,
+    "./islands/UploadImage.tsx": $UploadImage,
+  },
   baseUrl: import.meta.url,
 } satisfies Manifest;
 

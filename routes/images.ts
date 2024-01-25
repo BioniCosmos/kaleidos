@@ -7,6 +7,7 @@ import { parseFileName } from '../utils.ts'
 
 export const config: RouteConfig = {
   routeOverride: '/images/:year/:month/:day/:name',
+  skipInheritedLayouts: true,
 }
 
 export default defineRoute(async (req, ctx) => {
