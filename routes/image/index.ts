@@ -1,6 +1,7 @@
 import type { Handlers } from '$fresh/server.ts'
 import { ensureFile, exists } from '$std/fs/mod.ts'
 import { join } from '$std/path/mod.ts'
+import sharp from 'sharp'
 import { db, type Image } from '../../db.ts'
 import {
   fileNameWithSuffix,
@@ -29,7 +30,13 @@ export const handler: Handlers<unknown, State> = {
 
     const actualPath = join(Deno.cwd(), 'images/raw/', path)
     await ensureFile(actualPath)
-    await Deno.writeFile(actualPath, imageFile.stream())
+    const image = sharp(await imageFile.arrayBuffer())
+    const { orientation } = await image.metadata()
+    await image
+      .keepIccProfile()
+      .withExif({})
+      .withMetadata({ orientation })
+      .toFile(actualPath)
 
     const { id } = db.queryEntries<{ id: number }>(
       `

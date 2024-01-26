@@ -43,7 +43,14 @@ export default defineRoute(async (req, ctx) => {
 
   if (needConvert && !(await exists(actualPath))) {
     await ensureFile(actualPath)
-    await sharp(rawPath).toFormat(format).toFile(actualPath)
+    const image = sharp(rawPath)
+    const { orientation } = await image.metadata()
+    await image
+      .keepIccProfile()
+      .withExif({})
+      .withMetadata({ orientation })
+      .toFormat(format)
+      .toFile(actualPath)
   }
 
   try {
