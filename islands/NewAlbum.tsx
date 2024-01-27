@@ -1,4 +1,5 @@
 import { useState } from 'preact/hooks'
+import Icon from '../components/Icon.tsx'
 import Dialog from './Dialog.tsx'
 
 export default function NewAlbum() {
@@ -9,8 +10,11 @@ export default function NewAlbum() {
         onClick={() => setOpen(true)}
         class="py-2 px-4 flex gap-3 items-center fixed bottom-4 right-4 md:bottom-6 md:right-6 bg-blue-500 text-white font-bold rounded-full hover:bg-blue-700 transition"
       >
-        <span class="text-2xl">+</span>
-        <span>New album</span>
+        <Icon
+          name="plus"
+          options={{ width: 18, height: 18, 'stroke-width': 3 }}
+        />
+        <div>New album</div>
       </button>
       <Dialog open={open}>
         <h2 class="text-2xl font-bold">New album</h2>

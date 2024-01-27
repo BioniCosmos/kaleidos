@@ -14,13 +14,13 @@ export default defineLayout<State>((_req, ctx) => {
 
   return (
     <>
-      <header class="bg-gray-300 p-4 flex items-center justify-between">
-        <a href="/" class="text-2xl font-bold">
+      <header class="bg-gray-300 px-4 py-2 flex items-center justify-between">
+        <a href="/" class="text-xl font-bold">
           Kalaidos
         </a>
-        <div class="text-right space-y-2">
-          <h2 class="text-2xl font-bold">{user.name}</h2>
-          <h3 class="text-lg text-gray-500">{user.id}</h3>
+        <div class="text-right">
+          <h2 class="text-xl font-bold">{user.name}</h2>
+          <h3 class="text-gray-500">{user.id}</h3>
         </div>
       </header>
       <main class="p-4 pt-6">

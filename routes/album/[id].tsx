@@ -24,8 +24,12 @@ export default defineRoute((_req, ctx) => {
 
   return (
     <>
-      <h2>{album.name}</h2>
-      <div>{count} image(s)</div>
+      <div class="mb-6 flex items-center flex-col gap-1">
+        <h2 class="text-2xl font-bold">{album.name}</h2>
+        <div class="text-gray-500">
+          {count} image{count > 1 && 's'}
+        </div>
+      </div>
       <Upload albumId={album.id!} />
       <div class="grid grid-cols-[repeat(auto-fill,_minmax(250px,_1fr))] gap-4">
         {images.map((image) => (

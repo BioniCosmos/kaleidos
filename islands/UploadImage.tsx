@@ -1,4 +1,5 @@
 import { useState } from 'preact/hooks'
+import Icon from '../components/Icon.tsx'
 import Dialog from './Dialog.tsx'
 
 export default function Upload({ albumId }: { albumId: number }) {
@@ -25,8 +26,11 @@ export default function Upload({ albumId }: { albumId: number }) {
         role="button"
         class="py-2 px-4 flex gap-3 items-center fixed bottom-4 right-4 md:bottom-6 md:right-6 bg-blue-500 text-white font-bold rounded-full hover:bg-blue-700 transition"
       >
-        <span class="text-2xl">↑</span>
-        <span>Upload</span>
+        <Icon
+          name="upload"
+          options={{ width: 18, height: 18, 'stroke-width': 3 }}
+        />
+        <div>Upload</div>
         <input
           name="imageFile"
           type="file"
