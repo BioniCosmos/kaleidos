@@ -1,10 +1,11 @@
-import { useState } from 'preact/hooks'
+import { useRef, useState } from 'preact/hooks'
 import Icon from '../components/Icon.tsx'
 import Dialog from './Dialog.tsx'
 
 export default function Upload({ albumId }: { albumId: number }) {
   const [open, setOpen] = useState(false)
   const [images, setImages] = useState<string[]>([])
+  const inputRef = useRef<HTMLInputElement>(null)
 
   function preview(event: Event) {
     if (
@@ -39,6 +40,7 @@ export default function Upload({ albumId }: { albumId: number }) {
           accept="image/*"
           class="hidden"
           onChange={preview}
+          ref={inputRef}
         />
       </label>
       <input name="albumId" type="hidden" value={albumId} />
@@ -47,6 +49,7 @@ export default function Upload({ albumId }: { albumId: number }) {
         class="p-6 rounded space-y-4"
         onClose={() => {
           images.forEach((image) => URL.revokeObjectURL(image))
+          inputRef.current!.value = ''
         }}
       >
         <div class="flex flex-wrap justify-center gap-4">
