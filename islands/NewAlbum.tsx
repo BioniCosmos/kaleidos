@@ -34,10 +34,10 @@ export default function NewAlbum() {
               onClick={() => setOpen(false)}
               class="py-2 px-4 bg-red-500 text-white font-bold rounded-full hover:bg-red-700 transition focus:outline-none"
             >
-              Close
+              Cancel
             </button>
             <button class="py-2 px-4 bg-blue-500 text-white font-bold rounded-full hover:bg-blue-700 transition">
-              Create
+              Confirm
             </button>
           </div>
         </form>

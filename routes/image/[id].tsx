@@ -1,16 +1,28 @@
 import { defineRoute, type Handlers } from '$fresh/server.ts'
-import { join } from '$std/path/mod.ts'
+import { basename, dirname, extname, join } from '$std/path/mod.ts'
 import Icon from '../../components/Icon.tsx'
 import { db, type Album, type Image, type User } from '../../db.ts'
+import DeleteImage from '../../islands/DeleteImage.tsx'
 import { redirect } from '../../utils.ts'
 
 export const handler: Handlers = {
   POST(_req, ctx) {
     const { id } = ctx.params
-    const { albumId } = db.queryEntries<Pick<Image, 'albumId'>>(
-      'DELETE FROM images WHERE id = :id RETURNING albumId',
-      { id }
-    )[0]
+    const albumId = db.transaction(() => {
+      const { albumId, path } = db.queryEntries<
+        Pick<Image, 'albumId' | 'path'>
+      >('DELETE FROM images WHERE id = :id RETURNING albumId, path', { id })[0]
+
+      const rawPath = join(Deno.cwd(), 'images/raw/', path)
+      Deno.removeSync(rawPath)
+
+      const tmpPath = join(Deno.cwd(), 'images/tmp/', path)
+      Array.from(Deno.readDirSync(dirname(tmpPath)))
+        .filter(({ name }) => name.startsWith(basename(path)))
+        .forEach(({ name }) => Deno.removeSync(tmpPath + extname(name)))
+
+      return albumId
+    })
     return redirect(`/album/${albumId}`)
   },
 }
@@ -57,15 +69,7 @@ export default defineRoute((_req, ctx) => {
           </li>
         ))}
       </ul>
-      <form method="post">
-        <button class="py-2 px-4 flex gap-3 items-center fixed bottom-4 right-4 md:bottom-6 md:right-6 bg-red-500 text-white font-bold rounded-full hover:bg-red-700 transition">
-          <Icon
-            name="trash"
-            options={{ width: 18, height: 18, 'stroke-width': 3 }}
-          />
-          <div>Delete</div>
-        </button>
-      </form>
+      <DeleteImage />
     </>
   )
 })

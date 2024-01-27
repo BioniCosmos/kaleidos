@@ -1,3 +1,4 @@
+import type { JSX } from 'preact'
 import { useRef, useState } from 'preact/hooks'
 import Icon from '../components/Icon.tsx'
 import Dialog from './Dialog.tsx'
@@ -7,17 +8,13 @@ export default function Upload({ albumId }: { albumId: number }) {
   const [images, setImages] = useState<string[]>([])
   const inputRef = useRef<HTMLInputElement>(null)
 
-  function preview(event: Event) {
-    if (
-      !(event.target instanceof HTMLInputElement) ||
-      event.target.files === null
-    ) {
+  function preview(event: JSX.TargetedEvent<HTMLInputElement>) {
+    const files = event.currentTarget.files
+    if (files === null) {
       return
     }
 
-    setImages(
-      Array.from(event.target.files).map((file) => URL.createObjectURL(file))
-    )
+    setImages(Array.from(files).map((file) => URL.createObjectURL(file)))
     setOpen(true)
   }
 
@@ -63,7 +60,7 @@ export default function Upload({ albumId }: { albumId: number }) {
             onClick={() => setOpen(false)}
             class="py-2 px-4 bg-red-500 text-white font-bold rounded-full hover:bg-red-700 transition focus:outline-none"
           >
-            Close
+            Cancel
           </button>
           <button class="py-2 px-4 bg-blue-500 text-white font-bold rounded-full hover:bg-blue-700 transition">
             Confirm

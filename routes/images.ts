@@ -11,7 +11,7 @@ export const config: RouteConfig = {
 }
 
 export default defineRoute(async (req, ctx) => {
-  const path = Object.values(ctx.params).join('/')
+  const path = decodeURIComponent(Object.values(ctx.params).join('/'))
   const format = ctx.url.searchParams.get('format')
   const { ext } = parseFileName(path)
   const needConvert =

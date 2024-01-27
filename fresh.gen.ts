@@ -13,6 +13,7 @@ import * as $image_index from "./routes/image/index.ts";
 import * as $images from "./routes/images.ts";
 import * as $index from "./routes/index.tsx";
 import * as $login from "./routes/login.tsx";
+import * as $DeleteImage from "./islands/DeleteImage.tsx";
 import * as $Dialog from "./islands/Dialog.tsx";
 import * as $NewAlbum from "./islands/NewAlbum.tsx";
 import * as $UploadImage from "./islands/UploadImage.tsx";
@@ -33,6 +34,7 @@ const manifest = {
     "./routes/login.tsx": $login,
   },
   islands: {
+    "./islands/DeleteImage.tsx": $DeleteImage,
     "./islands/Dialog.tsx": $Dialog,
     "./islands/NewAlbum.tsx": $NewAlbum,
     "./islands/UploadImage.tsx": $UploadImage,
