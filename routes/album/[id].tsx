@@ -17,6 +17,10 @@ export default defineRoute((_req, ctx) => {
   ])[0][0] as number
   const page = Number(ctx.url.searchParams.get('page') ?? '1')
   const totalPages = Math.ceil(count / 15)
+  if (page < 1 || page > totalPages) {
+    return ctx.renderNotFound()
+  }
+
   const images = db.queryEntries<Image>(
     'SELECT * FROM images where albumId = ? LIMIT 15 OFFSET ?',
     [album.id, (page - 1) * 15]

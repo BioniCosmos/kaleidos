@@ -50,7 +50,10 @@ export default defineRoute((_req, ctx) => {
       new Date(image.date).toLocaleString(),
     ],
     [<Icon name="folder" options={{ width: 20, height: 20 }} />, albumName],
-    [<Icon name="user" options={{ width: 20, height: 20 }} />, userName],
+    [
+      <Icon name="user" options={{ width: 20, height: 20 }} />,
+      userName !== '' ? userName : image.userId,
+    ],
   ]
 
   return (
