@@ -1,6 +1,6 @@
 import { useState } from 'preact/hooks'
+import Dialog from '../components/Dialog.tsx'
 import Icon from '../components/Icon.tsx'
-import Dialog from './Dialog.tsx'
 
 export default function NewAlbum() {
   const [open, setOpen] = useState(false)
@@ -8,7 +8,7 @@ export default function NewAlbum() {
     <>
       <button
         onClick={() => setOpen(true)}
-        class="py-2 px-4 flex gap-3 items-center fixed bottom-4 right-4 md:bottom-6 md:right-6 bg-blue-500 text-white font-bold rounded-full hover:bg-blue-700 transition"
+        class="justify-center py-2 px-4 flex gap-3 items-center bg-blue-500 text-white font-bold rounded-full hover:bg-blue-700 transition"
       >
         <Icon
           name="plus"

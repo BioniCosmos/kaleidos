@@ -1,8 +1,7 @@
 import { defineRoute } from '$fresh/server.ts'
-import { join } from '$std/path/mod.ts'
 import Pagination from '../../components/Pagination.tsx'
 import { db, type Album, type Image } from '../../db.ts'
-import Upload from '../../islands/UploadImage.tsx'
+import Images from '../../islands/Images.tsx'
 
 export default defineRoute((_req, ctx) => {
   const album = db
@@ -17,7 +16,7 @@ export default defineRoute((_req, ctx) => {
   ])[0][0] as number
   const page = Number(ctx.url.searchParams.get('page') ?? '1')
   const totalPages = Math.ceil(count / 15)
-  if (page < 1 || page > totalPages) {
+  if ((page < 1 || page > totalPages) && totalPages !== 0) {
     return ctx.renderNotFound()
   }
 
@@ -34,18 +33,7 @@ export default defineRoute((_req, ctx) => {
           {count} image{count > 1 && 's'}
         </div>
       </div>
-      <Upload albumId={album.id!} />
-      <div class="grid grid-cols-[repeat(auto-fill,_minmax(250px,_1fr))] gap-4">
-        {images.map((image) => (
-          <a href={`/image/${image.id}`}>
-            <img
-              src={join('/images', image.path)}
-              loading="lazy"
-              class="w-full h-48 object-cover hover:scale-105 transition rounded shadow hover:shadow-lg"
-            />
-          </a>
-        ))}
-      </div>
+      <Images images={images} albumId={album.id!} />
       <Pagination
         currentPage={page}
         totalPages={totalPages}

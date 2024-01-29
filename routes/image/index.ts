@@ -1,6 +1,6 @@
 import type { Handlers } from '$fresh/server.ts'
-import { ensureFile, exists } from '$std/fs/mod.ts'
-import { join } from '$std/path/mod.ts'
+import { ensureFile, exists, existsSync } from '$std/fs/mod.ts'
+import { basename, dirname, extname, join } from '$std/path/mod.ts'
 import sharp from 'sharp'
 import { db, type Image } from '../../db.ts'
 import {
@@ -22,6 +22,15 @@ export const handler: Handlers<unknown, State> = {
       saveImage(imageFile, userId, albumId)
     )
     await Promise.all(jobs)
+    return redirect(`/album/${albumId}`)
+  },
+
+  async DELETE(req) {
+    const { id, selectedIds }: { id: number; selectedIds?: number[] } =
+      await req.json()
+    const ids = selectedIds ?? [id]
+    const jobs = ids.map((id) => deleteImage(id))
+    const [albumId] = await Promise.all(jobs)
     return redirect(`/album/${albumId}`)
   },
 }
@@ -62,4 +71,26 @@ async function saveImage(imageFile: File, userId: string, albumId: number) {
 `,
     { name, ext, date, userId, albumId, path } satisfies Image
   )
+}
+
+export function deleteImage(id: number) {
+  return db.transaction(() => {
+    const { albumId, path } = db.queryEntries<Pick<Image, 'albumId' | 'path'>>(
+      'DELETE FROM images WHERE id = :id RETURNING albumId, path',
+      { id }
+    )[0]
+
+    const rawPath = join(Deno.cwd(), 'images/raw/', path)
+    Deno.removeSync(rawPath)
+
+    const tmpPath = join(Deno.cwd(), 'images/tmp/', path)
+    const tmpDir = dirname(tmpPath)
+    if (existsSync(tmpDir)) {
+      Array.from(Deno.readDirSync(dirname(tmpPath)))
+        .filter(({ name }) => name.startsWith(basename(path)))
+        .forEach(({ name }) => Deno.removeSync(tmpPath + extname(name)))
+    }
+
+    return albumId
+  })
 }
