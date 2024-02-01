@@ -1,12 +1,13 @@
-import { defineLayout } from '$fresh/server.ts'
-import { db, type User } from '../db.ts'
+import { type PageProps } from '$fresh/server.ts'
+import Icon from '../components/Icon.tsx'
 import type { State } from './_middleware.tsx'
 
-export default defineLayout<State>((_req, ctx) => {
-  const { userId: id } = ctx.state
-  const user = db
-    .queryEntries<User>('SELECT * FROM users WHERE id = :id', { id })
-    .at(0)
+export default function Layout({
+  route,
+  state,
+  Component,
+}: PageProps<unknown, Partial<State>>) {
+  const { user } = state
   return (
     <>
       <header class="bg-gray-300 px-4 py-2 flex items-center justify-between">
@@ -14,21 +15,26 @@ export default defineLayout<State>((_req, ctx) => {
           Kalaidos
         </a>
         {user !== undefined && (
-          <div class="text-right">
-            <h2 class="text-xl font-bold">{user.name}</h2>
-            <h3 class="text-gray-500">{user.id}</h3>
+          <div class="flex items-center gap-6">
+            <a href="/settings">
+              <Icon name="settings" />
+            </a>
+            <div class="text-right">
+              <h2 class="text-xl font-bold">{user.name}</h2>
+              <h3 class="text-gray-500">{user.id}</h3>
+            </div>
           </div>
         )}
       </header>
       <main
         class={
-          ctx.route !== '/login'
+          route !== '/login'
             ? 'p-4 pt-6'
             : 'h-[calc(100vh_-_2.75rem)] flex items-center justify-center'
         }
       >
-        <ctx.Component />
+        <Component />
       </main>
     </>
   )
-})
+}

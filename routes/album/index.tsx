@@ -6,7 +6,7 @@ import { deleteImage } from '../image/index.ts'
 
 export const handler: Handlers<unknown, State> = {
   async POST(req, ctx) {
-    const { userId } = ctx.state
+    const { id: userId } = ctx.state.user
     const name = (await req.formData()).get('name') as string
     const { id } = db.queryEntries<{ id: number }>(
       'INSERT INTO albums (name, userId) VALUES (?, ?) RETURNING id',

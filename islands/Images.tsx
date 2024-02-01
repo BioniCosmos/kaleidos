@@ -3,6 +3,7 @@ import type { JSX } from 'preact'
 import { useState } from 'preact/hooks'
 import Checkbox from '../components/Checkbox.tsx'
 import FloatingMenu from '../components/FloatingMenu.tsx'
+import Grid from '../components/Grid.tsx'
 import MultiSelectionMenu from '../components/MultiSelectionMenu.tsx'
 import type { Image } from '../db.ts'
 import UploadImage from './UploadImage.tsx'
@@ -38,7 +39,7 @@ export default function Images({
 
   return (
     <>
-      <div class="grid grid-cols-[repeat(auto-fill,_minmax(250px,_1fr))] gap-4 pb-4">
+      <Grid>
         {images.map(({ id: _id, path }) => {
           const id = _id!
           return (
@@ -56,7 +57,7 @@ export default function Images({
             </a>
           )
         })}
-      </div>
+      </Grid>
       <FloatingMenu>
         <MultiSelectionMenu
           selectedIds={selectedIds}

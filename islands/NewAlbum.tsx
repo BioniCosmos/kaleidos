@@ -1,46 +1,35 @@
 import { useState } from 'preact/hooks'
+import Button from '../components/Button.tsx'
 import Dialog from '../components/Dialog.tsx'
+import Form from '../components/Form.tsx'
 import Icon from '../components/Icon.tsx'
+import Input from '../components/Input.tsx'
 
 export default function NewAlbum() {
   const [open, setOpen] = useState(false)
   return (
     <>
-      <button
+      <Button
         onClick={() => setOpen(true)}
-        class="justify-center py-2 px-4 flex gap-3 items-center bg-blue-500 text-white font-bold rounded-full hover:bg-blue-700 transition"
+        class="flex gap-3 items-center justify-center"
       >
         <Icon
           name="plus"
           options={{ width: 18, height: 18, 'stroke-width': 3 }}
         />
         <div>New album</div>
-      </button>
+      </Button>
       <Dialog open={open}>
         <h2 class="text-2xl font-bold">New album</h2>
-        <form method="post" action="/album" class="mt-8 flex flex-col gap-6">
-          <label class="block">
-            <span class="text-gray-700">Name</span>
-            <input
-              type="text"
-              name="name"
-              required
-              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-            />
-          </label>
+        <Form method="post" action="/album" class="mt-8">
+          <Input label="Name" name="name" required />
           <div class="flex justify-center gap-2">
-            <button
-              type="button"
-              onClick={() => setOpen(false)}
-              class="py-2 px-4 bg-red-500 text-white font-bold rounded-full hover:bg-red-700 transition focus:outline-none"
-            >
+            <Button color="red" type="button" onClick={() => setOpen(false)}>
               Cancel
-            </button>
-            <button class="py-2 px-4 bg-blue-500 text-white font-bold rounded-full hover:bg-blue-700 transition">
-              Confirm
-            </button>
+            </Button>
+            <Button>Confirm</Button>
           </div>
-        </form>
+        </Form>
       </Dialog>
     </>
   )

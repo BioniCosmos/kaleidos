@@ -1,21 +1,13 @@
-import { defineRoute } from '$fresh/server.ts'
-import { db, type Album, type User } from '../db.ts'
+import { type PageProps } from '$fresh/server.ts'
+import { db, type Album } from '../db.ts'
 import Albums from '../islands/Albums.tsx'
 import type { State } from './_middleware.tsx'
 
-export default defineRoute<State>((_req, ctx) => {
-  const { userId: id } = ctx.state
-  const user = db
-    .queryEntries<User>('SELECT * FROM users WHERE id = :id', { id })
-    .at(0)
-  if (user === undefined) {
-    return ctx.renderNotFound()
-  }
-
+export default function Index({ state }: PageProps<unknown, State>) {
+  const { id: userId } = state.user
   const albums = db.queryEntries<Album>(
-    'SELECT * FROM albums WHERE userId = ?',
-    [user.id]
+    'SELECT * FROM albums WHERE userId = :userId',
+    { userId }
   )
-
   return <Albums albums={albums} />
-})
+}

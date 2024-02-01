@@ -1,5 +1,6 @@
 import type { JSX } from 'preact'
 import { useRef, useState } from 'preact/hooks'
+import Button from '../components/Button.tsx'
 import Dialog from '../components/Dialog.tsx'
 import Icon from '../components/Icon.tsx'
 
@@ -43,7 +44,6 @@ export default function UploadImage({ albumId }: { albumId: number }) {
       <input name="albumId" type="hidden" value={albumId} />
       <Dialog
         open={open}
-        class="p-6 rounded space-y-4"
         onClose={() => {
           images.forEach((image) => URL.revokeObjectURL(image))
           inputRef.current!.value = ''
@@ -55,16 +55,10 @@ export default function UploadImage({ albumId }: { albumId: number }) {
           ))}
         </div>
         <div class="mt-6 flex justify-center gap-2">
-          <button
-            type="button"
-            onClick={() => setOpen(false)}
-            class="py-2 px-4 bg-red-500 text-white font-bold rounded-full hover:bg-red-700 transition focus:outline-none"
-          >
+          <Button color="red" type="button" onClick={() => setOpen(false)}>
             Cancel
-          </button>
-          <button class="py-2 px-4 bg-blue-500 text-white font-bold rounded-full hover:bg-blue-700 transition">
-            Confirm
-          </button>
+          </Button>
+          <Button>Confirm</Button>
         </div>
       </Dialog>
     </form>

@@ -1,5 +1,6 @@
 import type { JSX } from 'preact'
 import { useState } from 'preact/hooks'
+import Button from '../components/Button.tsx'
 import Dialog from '../components/Dialog.tsx'
 import Icon from '../components/Icon.tsx'
 
@@ -50,8 +51,9 @@ export default function DeleteSelection({
 
   return (
     <>
-      <button
-        class="justify-center py-2 px-4 flex gap-3 items-center bg-red-500 text-white font-bold rounded-full hover:bg-red-700 transition"
+      <Button
+        color="red"
+        class="flex gap-3 items-center justify-center"
         onClick={openDialog}
       >
         <Icon
@@ -59,20 +61,13 @@ export default function DeleteSelection({
           options={{ width: 18, height: 18, 'stroke-width': 3 }}
         />
         <div>Delete</div>
-      </button>
+      </Button>
       <Dialog open={open} onClose={closeDialog}>
         <h2 class="text-2xl font-bold">Warning!</h2>
         <div class="mt-8">Are you sure to delete the content?</div>
         <form method="dialog" class="mt-6 flex justify-center gap-2">
-          <button class="py-2 px-4 bg-red-500 text-white font-bold rounded-full hover:bg-red-700 transition focus:outline-none">
-            Cancel
-          </button>
-          <button
-            value="confirm"
-            class="py-2 px-4 bg-blue-500 text-white font-bold rounded-full hover:bg-blue-700 transition"
-          >
-            Confirm
-          </button>
+          <Button color="red">Cancel</Button>
+          <Button value="confirm">Confirm</Button>
         </form>
       </Dialog>
     </>

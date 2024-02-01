@@ -1,8 +1,10 @@
 import type { FreshContext } from '$fresh/server.ts'
+import type { User } from '../db.ts'
+import { db } from '../db.ts'
 import { redirect, verifyToken } from '../utils.ts'
 
 export interface State {
-  userId: string
+  user: User
 }
 
 export async function handler(req: Request, ctx: FreshContext<State>) {
@@ -26,7 +28,12 @@ export async function handler(req: Request, ctx: FreshContext<State>) {
   }
 
   if (isValid) {
-    ctx.state = { userId }
+    const [user] = db.queryEntries<User>('SELECT * FROM users WHERE id = ?', [
+      userId,
+    ])
+    ctx.state = {
+      user,
+    }
   }
   return ctx.next()
 }

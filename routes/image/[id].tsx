@@ -2,10 +2,11 @@ import { defineRoute } from '$fresh/server.ts'
 import { join } from '$std/path/mod.ts'
 import FloatingMenu from '../../components/FloatingMenu.tsx'
 import Icon from '../../components/Icon.tsx'
-import { db, type Album, type Image, type User } from '../../db.ts'
+import { db, type Album, type Image } from '../../db.ts'
 import DeleteSelection from '../../islands/DeleteSelection.tsx'
+import type { State } from '../_middleware.tsx'
 
-export default defineRoute((_req, ctx) => {
+export default defineRoute<State>((_req, ctx) => {
   const image = db
     .queryEntries<Image>('SELECT * FROM images WHERE id = :id', ctx.params)
     .at(0)
@@ -17,10 +18,7 @@ export default defineRoute((_req, ctx) => {
     'SELECT name from albums where id = ?',
     [image.albumId]
   )[0].name
-  const userName = db.queryEntries<Pick<User, 'name'>>(
-    'SELECT name from users where id = ?',
-    [image.userId]
-  )[0].name
+  const { name: userName } = ctx.state.user
 
   const info = [
     [

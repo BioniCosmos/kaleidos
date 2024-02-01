@@ -16,10 +16,10 @@ export const handler: Handlers<unknown, State> = {
   async POST(req, ctx) {
     const formData = await req.formData()
     const imageFiles = formData.getAll('imageFile') as File[]
-    const { userId } = ctx.state
+    const { id: userId } = ctx.state.user
     const albumId = Number(formData.get('albumId') as string)
     const jobs = imageFiles.map((imageFile) =>
-      saveImage(imageFile, userId, albumId)
+      saveImage(imageFile, userId!, albumId)
     )
     await Promise.all(jobs)
     return redirect(`/album/${albumId}`)

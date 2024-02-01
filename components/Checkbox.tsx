@@ -1,4 +1,4 @@
-import { clsx } from 'https://esm.sh/clsx@2.1.0'
+import { clsx } from 'clsx'
 import type { JSX } from 'preact'
 
 interface Props extends Omit<JSX.HTMLAttributes<HTMLInputElement>, 'id'> {

@@ -24,7 +24,8 @@
     "$std/": "https://deno.land/std@0.208.0/",
     "sqlite": "https://deno.land/x/sqlite@v3.8/mod.ts",
     "argon2": "./argon2/mod.ts",
-    "sharp": "npm:sharp@0.33.2"
+    "sharp": "npm:sharp@0.33.2",
+    "clsx": "https://esm.sh/clsx@2.1.0"
   },
   "compilerOptions": {
     "jsx": "react-jsx",

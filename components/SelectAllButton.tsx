@@ -1,4 +1,5 @@
 import type { JSX } from 'preact'
+import Button from './Button.tsx'
 
 export default function SelectAllButton({
   allSelected,
@@ -10,11 +11,8 @@ export default function SelectAllButton({
   isNone: boolean
 }) {
   return !isNone ? (
-    <button
-      class="text-center py-2 px-4 bg-blue-500 text-white font-bold rounded-full hover:bg-blue-700 transition"
-      onClick={onClick}
-    >
+    <Button onClick={onClick}>
       {!allSelected ? 'Select all' : 'Clear selection'}
-    </button>
+    </Button>
   ) : null
 }

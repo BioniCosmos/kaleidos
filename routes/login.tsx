@@ -1,5 +1,8 @@
 import { type Handlers } from '$fresh/server.ts'
 import { verify } from 'argon2'
+import Button from '../components/Button.tsx'
+import Form from '../components/Form.tsx'
+import Input from '../components/Input.tsx'
 import { db, type User } from '../db.ts'
 import { jwtSign, redirect } from '../utils.ts'
 
@@ -32,30 +35,10 @@ export const handler: Handlers = {
 
 export default function Login() {
   return (
-    <form
-      method="post"
-      class="bg-white p-8 rounded shadow grid grid-cols-1 gap-6"
-    >
-      <label class="block">
-        <span class="text-gray-700">Id</span>
-        <input
-          name="id"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-          required
-        />
-      </label>
-      <label class="block">
-        <span class="text-gray-700">Password</span>
-        <input
-          type="password"
-          name="password"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-          required
-        />
-      </label>
-      <button class="py-2 px-4 bg-blue-500 text-white font-bold rounded-full hover:bg-blue-700 transition">
-        Login
-      </button>
-    </form>
+    <Form method="post" class="bg-white p-8 rounded shadow">
+      <Input label="Id" name="id" required />
+      <Input label="Password" type="password" name="password" required />
+      <Button>Login</Button>
+    </Form>
   )
 }

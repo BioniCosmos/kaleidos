@@ -2,6 +2,7 @@ import type { JSX } from 'preact'
 import { useState } from 'preact/hooks'
 import Checkbox from '../components/Checkbox.tsx'
 import FloatingMenu from '../components/FloatingMenu.tsx'
+import Grid from '../components/Grid.tsx'
 import MultiSelectionMenu from '../components/MultiSelectionMenu.tsx'
 import type { Album } from '../db.ts'
 import NewAlbum from './NewAlbum.tsx'
@@ -31,7 +32,7 @@ export default function Albums({ albums }: { albums: Album[] }) {
 
   return (
     <>
-      <div class="grid grid-cols-[repeat(auto-fill,_minmax(250px,_1fr))] gap-4 pb-4">
+      <Grid>
         {albums.map(({ id: _id, name }) => {
           const id = _id!
           return (
@@ -48,7 +49,7 @@ export default function Albums({ albums }: { albums: Album[] }) {
             </a>
           )
         })}
-      </div>
+      </Grid>
       <FloatingMenu>
         <MultiSelectionMenu
           selectedIds={selectedIds}
