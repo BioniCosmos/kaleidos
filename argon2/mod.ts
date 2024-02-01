@@ -1,4 +1,4 @@
-import { dirname, fromFileUrl, join } from '$std/path/mod.ts'
+import { join } from '$std/path/mod.ts'
 import './wasm_exec.js'
 
 declare class Go {
@@ -7,7 +7,7 @@ declare class Go {
 }
 
 const go = new Go()
-const wasmPath = join(dirname(fromFileUrl(import.meta.url)), 'argon2.wasm')
+const wasmPath = join(import.meta.dirname!, 'argon2.wasm')
 const { instance } = await WebAssembly.instantiate(
   Deno.readFileSync(wasmPath),
   go.importObject
@@ -15,11 +15,9 @@ const { instance } = await WebAssembly.instantiate(
 go.run(instance)
 
 declare global {
-  interface Window {
-    hash(password: string): string
-    verify(password: string, hash: string): string
-  }
+  function hash(password: string): string
+  function verify(password: string, hash: string): string
 }
 
-export const hash = window.hash
-export const verify = window.verify
+export const hash = globalThis.hash
+export const verify = globalThis.verify
