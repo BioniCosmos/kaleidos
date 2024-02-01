@@ -21,6 +21,6 @@ export const handler: Handlers<unknown, State> = {
 
     const hashedPassword = hash(newPassword as string)
     db.query('UPDATE users SET password = ? WHERE id = ?', [hashedPassword, id])
-    return new Response()
+    return redirect('/settings')
   },
 }

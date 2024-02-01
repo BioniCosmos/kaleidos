@@ -3,6 +3,7 @@ import { useState } from 'preact/hooks'
 import Button from '../components/Button.tsx'
 import Dialog from '../components/Dialog.tsx'
 import Icon from '../components/Icon.tsx'
+import { deleteContent } from '../utils.ts'
 
 interface CommonProps {
   target: 'image' | 'album'
@@ -32,22 +33,12 @@ export default function DeleteSelection({
     setOpen(true)
   }
 
-  function closeDialog(event: JSX.TargetedEvent<HTMLDialogElement>) {
-    setOpen(false)
-    if (event.currentTarget.returnValue !== 'confirm') {
-      return
-    }
-
-    fetch(`/${target}`, {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json; charset=utf-8' },
-      body: JSON.stringify(
-        'id' in props
-          ? { id: props.id }
-          : { selectedIds: setToArray(props.selectedIds) }
-      ),
-    }).then((value) => location.assign(value.url))
-  }
+  const submit = deleteContent(
+    target,
+    'id' in props
+      ? { id: props.id }
+      : { selectedIds: setToArray(props.selectedIds) }
+  )
 
   return (
     <>
@@ -62,13 +53,13 @@ export default function DeleteSelection({
         />
         <div>Delete</div>
       </Button>
-      <Dialog open={open} onClose={closeDialog}>
-        <h2 class="text-2xl font-bold">Warning!</h2>
-        <div class="mt-8">Are you sure to delete the content?</div>
-        <form method="dialog" class="mt-6 flex justify-center gap-2">
-          <Button color="red">Cancel</Button>
-          <Button value="confirm">Confirm</Button>
-        </form>
+      <Dialog
+        open={open}
+        title="Warning!"
+        close={() => setOpen(false)}
+        onConfirm={submit}
+      >
+        <div>Are you sure to delete the content?</div>
       </Dialog>
     </>
   )

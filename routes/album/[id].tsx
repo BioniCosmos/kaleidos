@@ -1,7 +1,18 @@
-import { defineRoute } from '$fresh/server.ts'
+import { defineRoute, type Handlers } from '$fresh/server.ts'
 import Pagination from '../../components/Pagination.tsx'
 import { db, type Album, type Image } from '../../db.ts'
+import AlbumInfo from '../../islands/AlbumInfo.tsx'
 import Images from '../../islands/Images.tsx'
+import { redirect } from '../../utils.ts'
+
+export const handler: Handlers = {
+  async POST(req, ctx) {
+    const name = (await req.formData()).get('name') as string
+    const { id } = ctx.params
+    db.query('UPDATE albums SET name = :name WHERE id = :id', { name, id })
+    return redirect(req.url)
+  },
+}
 
 export default defineRoute((_req, ctx) => {
   const album = db
@@ -27,11 +38,9 @@ export default defineRoute((_req, ctx) => {
 
   return (
     <>
-      <div class="mb-6 flex items-center flex-col gap-1">
+      <div class="mb-6 flex items-center flex-col gap-4">
         <h2 class="text-2xl font-bold">{album.name}</h2>
-        <div class="text-gray-500">
-          {count} image{count > 1 && 's'}
-        </div>
+        <AlbumInfo album={album} count={count} />
       </div>
       <Images images={images} albumId={album.id} />
       <Pagination

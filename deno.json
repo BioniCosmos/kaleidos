@@ -25,7 +25,8 @@
     "sqlite": "https://deno.land/x/sqlite@v3.8/mod.ts",
     "argon2": "./argon2/mod.ts",
     "sharp": "npm:sharp@0.33.2",
-    "clsx": "https://esm.sh/clsx@2.1.0"
+    "clsx": "https://esm.sh/clsx@2.1.0",
+    "feather-icons": "https://esm.sh/feather-icons@4.29.1"
   },
   "compilerOptions": {
     "jsx": "react-jsx",

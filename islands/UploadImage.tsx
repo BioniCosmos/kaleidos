@@ -1,6 +1,5 @@
 import type { JSX } from 'preact'
 import { useRef, useState } from 'preact/hooks'
-import Button from '../components/Button.tsx'
 import Dialog from '../components/Dialog.tsx'
 import Icon from '../components/Icon.tsx'
 
@@ -8,6 +7,7 @@ export default function UploadImage({ albumId }: { albumId: number }) {
   const [open, setOpen] = useState(false)
   const [images, setImages] = useState<string[]>([])
   const inputRef = useRef<HTMLInputElement>(null)
+  const formRef = useRef<HTMLFormElement>(null)
 
   function preview(event: JSX.TargetedEvent<HTMLInputElement>) {
     const files = event.currentTarget.files
@@ -19,8 +19,22 @@ export default function UploadImage({ albumId }: { albumId: number }) {
     setOpen(true)
   }
 
+  function clean() {
+    images.forEach((image) => URL.revokeObjectURL(image))
+    inputRef.current!.value = ''
+  }
+
+  function submit() {
+    formRef.current?.submit()
+  }
+
   return (
-    <form method="post" action="/image" enctype="multipart/form-data">
+    <form
+      method="post"
+      action="/image"
+      enctype="multipart/form-data"
+      ref={formRef}
+    >
       <label
         role="button"
         class="justify-center py-2 px-4 flex gap-3 items-center bg-blue-500 text-white font-bold rounded-full hover:bg-blue-700 transition"
@@ -44,21 +58,14 @@ export default function UploadImage({ albumId }: { albumId: number }) {
       <input name="albumId" type="hidden" value={albumId} />
       <Dialog
         open={open}
-        onClose={() => {
-          images.forEach((image) => URL.revokeObjectURL(image))
-          inputRef.current!.value = ''
-        }}
+        close={() => setOpen(false)}
+        onClose={clean}
+        onConfirm={submit}
       >
         <div class="flex flex-wrap justify-center gap-4">
           {images.map((image) => (
             <img src={image} class="w-28 h-28 object-cover rounded" />
           ))}
-        </div>
-        <div class="mt-6 flex justify-center gap-2">
-          <Button color="red" type="button" onClick={() => setOpen(false)}>
-            Cancel
-          </Button>
-          <Button>Confirm</Button>
         </div>
       </Dialog>
     </form>

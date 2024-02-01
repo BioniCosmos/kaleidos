@@ -16,6 +16,7 @@ import * as $login from "./routes/login.tsx";
 import * as $settings_index from "./routes/settings/index.tsx";
 import * as $settings_password from "./routes/settings/password.tsx";
 import * as $settings_profile from "./routes/settings/profile.tsx";
+import * as $AlbumInfo from "./islands/AlbumInfo.tsx";
 import * as $Albums from "./islands/Albums.tsx";
 import * as $DeleteSelection from "./islands/DeleteSelection.tsx";
 import * as $Images from "./islands/Images.tsx";
@@ -41,6 +42,7 @@ const manifest = {
     "./routes/settings/profile.tsx": $settings_profile,
   },
   islands: {
+    "./islands/AlbumInfo.tsx": $AlbumInfo,
     "./islands/Albums.tsx": $Albums,
     "./islands/DeleteSelection.tsx": $DeleteSelection,
     "./islands/Images.tsx": $Images,

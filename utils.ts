@@ -91,3 +91,12 @@ export function fileNameWithSuffix(fileName: string) {
 }
 
 export const randomId = new ShortUniqueId({ length: 10 }).randomUUID
+
+export function deleteContent(target: 'album' | 'image', value: unknown) {
+  return () =>
+    fetch(`/${target}`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json; charset=utf-8' },
+      body: JSON.stringify(value),
+    }).then((value) => location.assign(value.url))
+}

@@ -1,4 +1,4 @@
-import { useState } from 'preact/hooks'
+import { useRef, useState } from 'preact/hooks'
 import Button from '../components/Button.tsx'
 import Dialog from '../components/Dialog.tsx'
 import Form from '../components/Form.tsx'
@@ -7,6 +7,12 @@ import Input from '../components/Input.tsx'
 
 export default function NewAlbum() {
   const [open, setOpen] = useState(false)
+  const formRef = useRef<HTMLFormElement>(null)
+
+  function submit() {
+    formRef.current?.submit()
+  }
+
   return (
     <>
       <Button
@@ -19,16 +25,14 @@ export default function NewAlbum() {
         />
         <div>New album</div>
       </Button>
-      <Dialog open={open}>
-        <h2 class="text-2xl font-bold">New album</h2>
-        <Form method="post" action="/album" class="mt-8">
+      <Dialog
+        open={open}
+        title="New album"
+        close={() => setOpen(false)}
+        onConfirm={submit}
+      >
+        <Form method="post" action="/album" ref={formRef}>
           <Input label="Name" name="name" required />
-          <div class="flex justify-center gap-2">
-            <Button color="red" type="button" onClick={() => setOpen(false)}>
-              Cancel
-            </Button>
-            <Button>Confirm</Button>
-          </div>
         </Form>
       </Dialog>
     </>

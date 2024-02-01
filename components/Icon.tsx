@@ -1,7 +1,7 @@
 import feather, {
   type FeatherAttributes,
   type FeatherIconNames,
-} from 'https://esm.sh/feather-icons@4.29.1'
+} from 'feather-icons'
 
 export default function Icon({
   name,
