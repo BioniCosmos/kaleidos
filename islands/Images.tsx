@@ -32,7 +32,7 @@ export default function Images({
 
   function buttonOnClick() {
     const next = !allSelected
-      ? new Set(images.map(({ id }) => id!))
+      ? new Set(images.map(({ id }) => id))
       : new Set<number>()
     setSelectedIds(next)
   }
@@ -40,23 +40,20 @@ export default function Images({
   return (
     <>
       <Grid>
-        {images.map(({ id: _id, path }) => {
-          const id = _id!
-          return (
-            <a href={`/image/${id}`} class="relative group">
-              <img
-                src={join('/images', path)}
-                loading="lazy"
-                class="w-full h-48 object-cover hover:scale-105 transition rounded shadow hover:shadow-lg"
-              />
-              <Checkbox
-                id={id}
-                selectedIds={selectedIds}
-                onChange={checkboxOnChange(id)}
-              />
-            </a>
-          )
-        })}
+        {images.map(({ id, path }) => (
+          <a href={`/image/${id}`} class="relative group">
+            <img
+              src={join('/images', path)}
+              loading="lazy"
+              class="w-full h-48 object-cover hover:scale-105 transition rounded shadow hover:shadow-lg"
+            />
+            <Checkbox
+              id={id}
+              selectedIds={selectedIds}
+              onChange={checkboxOnChange(id)}
+            />
+          </a>
+        ))}
       </Grid>
       <FloatingMenu>
         <MultiSelectionMenu

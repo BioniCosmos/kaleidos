@@ -49,7 +49,7 @@ export default defineRoute<State>((_req, ctx) => {
         ))}
       </ul>
       <FloatingMenu>
-        <DeleteSelection target="image" id={image.id!} />
+        <DeleteSelection target="image" id={image.id} />
       </FloatingMenu>
     </>
   )

@@ -19,7 +19,7 @@ export const handler: Handlers<unknown, State> = {
     const { id: userId } = ctx.state.user
     const albumId = Number(formData.get('albumId') as string)
     const jobs = imageFiles.map((imageFile) =>
-      saveImage(imageFile, userId!, albumId)
+      saveImage(imageFile, userId, albumId)
     )
     await Promise.all(jobs)
     return redirect(`/album/${albumId}`)
@@ -69,7 +69,7 @@ async function saveImage(imageFile: File, userId: string, albumId: number) {
     :path
   )
 `,
-    { name, ext, date, userId, albumId, path } satisfies Image
+    { name, ext, date, userId, albumId, path } satisfies Omit<Image, 'id'>
   )
 }
 

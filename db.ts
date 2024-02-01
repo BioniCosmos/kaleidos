@@ -1,7 +1,7 @@
 import { DB } from 'sqlite'
 
 export type Image = {
-  id?: number
+  id: number
   name: string
   ext: string
   date: number
@@ -11,13 +11,13 @@ export type Image = {
 }
 
 export type Album = {
-  id?: number
+  id: number
   name: string
   userId: string
 }
 
 export type User = {
-  id?: string
+  id: string
   password: string
   name: string
   isAdmin: boolean

@@ -33,7 +33,7 @@ export default defineRoute((_req, ctx) => {
           {count} image{count > 1 && 's'}
         </div>
       </div>
-      <Images images={images} albumId={album.id!} />
+      <Images images={images} albumId={album.id} />
       <Pagination
         currentPage={page}
         totalPages={totalPages}

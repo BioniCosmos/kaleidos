@@ -25,7 +25,7 @@ export default function Albums({ albums }: { albums: Album[] }) {
 
   function buttonOnClick() {
     const next = !allSelected
-      ? new Set(albums.map(({ id }) => id!))
+      ? new Set(albums.map(({ id }) => id))
       : new Set<number>()
     setSelectedIds(next)
   }
@@ -33,22 +33,19 @@ export default function Albums({ albums }: { albums: Album[] }) {
   return (
     <>
       <Grid>
-        {albums.map(({ id: _id, name }) => {
-          const id = _id!
-          return (
-            <a
-              href={`/album/${id}`}
-              class="relative group rounded shadow bg-gray-100 hover:bg-gray-200 p-4 text-xl hover:scale-105 hover:shadow-lg transition"
-            >
-              <Checkbox
-                id={id}
-                selectedIds={selectedIds}
-                onChange={checkboxOnChange(id)}
-              />
-              {name}
-            </a>
-          )
-        })}
+        {albums.map(({ id, name }) => (
+          <a
+            href={`/album/${id}`}
+            class="relative group rounded shadow bg-gray-100 hover:bg-gray-200 p-4 text-xl hover:scale-105 hover:shadow-lg transition"
+          >
+            <Checkbox
+              id={id}
+              selectedIds={selectedIds}
+              onChange={checkboxOnChange(id)}
+            />
+            {name}
+          </a>
+        ))}
       </Grid>
       <FloatingMenu>
         <MultiSelectionMenu
