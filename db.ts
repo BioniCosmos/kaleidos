@@ -8,6 +8,7 @@ export type Image = {
   userId: string
   albumId: number
   path: string
+  size: number
 }
 
 export type Album = {
@@ -32,7 +33,8 @@ export function createImageTable(db: DB) {
     date INTEGER NOT NULL,
     userId TEXT NOT NULL,
     albumId INTEGER NOT NULL,
-    path TEXT NOT NULL
+    path TEXT NOT NULL,
+    size INTEGER NOT NULL
   )
 `)
 }

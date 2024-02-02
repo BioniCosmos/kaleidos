@@ -46,6 +46,7 @@ async function saveImage(imageFile: File, userId: string, albumId: number) {
     needSuffix ? fileNameWithSuffix(imageFile.name) : imageFile.name,
     time
   )
+  const size = imageFile.size
 
   const actualPath = join(Deno.cwd(), 'images/raw/', path)
   await ensureFile(actualPath)
@@ -66,10 +67,11 @@ async function saveImage(imageFile: File, userId: string, albumId: number) {
     :date,
     :userId,
     :albumId,
-    :path
+    :path,
+    :size
   )
 `,
-    { name, ext, date, userId, albumId, path } satisfies Omit<Image, 'id'>
+    { name, ext, date, userId, albumId, path, size } satisfies Omit<Image, 'id'>
   )
 }
 

@@ -1,10 +1,25 @@
-import { defineRoute } from '$fresh/server.ts'
+import { defineRoute, type Handlers } from '$fresh/server.ts'
 import { join } from '$std/path/mod.ts'
-import FloatingMenu from '../../components/FloatingMenu.tsx'
 import Icon from '../../components/Icon.tsx'
 import { db, type Album, type Image } from '../../db.ts'
-import DeleteSelection from '../../islands/DeleteSelection.tsx'
+import ImageInfo from '../../islands/ImageInfo.tsx'
+import { redirect } from '../../utils.ts'
 import type { State } from '../_middleware.tsx'
+
+export const handler: Handlers = {
+  async POST(req, ctx) {
+    const formData = await req.formData()
+    const name = formData.get('name') as string
+    const albumId = Number(formData.get('albumId') as string)
+    const { id } = ctx.params
+
+    db.query(
+      'UPDATE images SET name = :name, albumId = :albumId WHERE id = :id',
+      { name, albumId, id }
+    )
+    return redirect(req.url)
+  },
+}
 
 export default defineRoute<State>((_req, ctx) => {
   const image = db
@@ -18,7 +33,7 @@ export default defineRoute<State>((_req, ctx) => {
     'SELECT name from albums where id = ?',
     [image.albumId]
   )[0].name
-  const { name: userName } = ctx.state.user
+  const { name: userName, id: userId } = ctx.state.user
 
   const info = [
     [
@@ -32,10 +47,18 @@ export default defineRoute<State>((_req, ctx) => {
     ],
   ]
 
+  const options = db
+    .queryEntries<Pick<Album, 'id' | 'name'>>(
+      'SELECT id, name FROM albums WHERE userId = :userId',
+      { userId }
+    )
+    .map(({ id, name }) => ({ value: id, name }))
+
   return (
     <>
-      <div class="mb-6 flex items-center flex-col gap-1">
+      <div class="mb-6 flex items-center flex-col gap-4">
         <h2 class="text-2xl font-bold">{image.name}</h2>
+        <ImageInfo image={image} options={options} />
       </div>
       <a href={join('/images', image.path)}>
         <img src={join('/images', image.path)} class="max-h-[75vh] mx-auto" />
@@ -48,9 +71,6 @@ export default defineRoute<State>((_req, ctx) => {
           </li>
         ))}
       </ul>
-      <FloatingMenu>
-        <DeleteSelection target="image" id={image.id} />
-      </FloatingMenu>
     </>
   )
 })
