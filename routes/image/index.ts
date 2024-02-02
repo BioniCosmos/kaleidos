@@ -33,6 +33,16 @@ export const handler: Handlers<unknown, State> = {
     const [albumId] = await Promise.all(jobs)
     return redirect(`/album/${albumId}`)
   },
+
+  async PUT(req) {
+    const { ids, albumId }: { ids: number[]; albumId: number } =
+      await req.json()
+    db.query(
+      `UPDATE images SET albumId = :albumId WHERE id IN (${ids.join(', ')})`,
+      { albumId }
+    )
+    return redirect(`/album/${albumId}`)
+  },
 }
 
 async function saveImage(imageFile: File, userId: string, albumId: number) {

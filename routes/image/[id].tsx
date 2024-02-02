@@ -3,7 +3,7 @@ import { join } from '$std/path/mod.ts'
 import Icon from '../../components/Icon.tsx'
 import { db, type Album, type Image } from '../../db.ts'
 import ImageInfo from '../../islands/ImageInfo.tsx'
-import { redirect } from '../../utils.ts'
+import { getAlbumOptions, redirect } from '../../utils.ts'
 import type { State } from '../_middleware.tsx'
 
 export const handler: Handlers = {
@@ -47,18 +47,11 @@ export default defineRoute<State>((_req, ctx) => {
     ],
   ]
 
-  const options = db
-    .queryEntries<Pick<Album, 'id' | 'name'>>(
-      'SELECT id, name FROM albums WHERE userId = :userId',
-      { userId }
-    )
-    .map(({ id, name }) => ({ value: id, name }))
-
   return (
     <>
       <div class="mb-6 flex items-center flex-col gap-4">
         <h2 class="text-2xl font-bold">{image.name}</h2>
-        <ImageInfo image={image} options={options} />
+        <ImageInfo image={image} options={getAlbumOptions(userId)} />
       </div>
       <a href={join('/images', image.path)}>
         <img src={join('/images', image.path)} class="max-h-[75vh] mx-auto" />

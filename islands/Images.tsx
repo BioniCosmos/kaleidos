@@ -2,20 +2,30 @@ import { join } from '$std/path/mod.ts'
 import type { JSX } from 'preact'
 import { useState } from 'preact/hooks'
 import Checkbox from '../components/Checkbox.tsx'
+import Dialog from '../components/Dialog.tsx'
+import FloatButton from '../components/FloatButton.tsx'
 import FloatingMenu from '../components/FloatingMenu.tsx'
 import Grid from '../components/Grid.tsx'
-import MultiSelectionMenu from '../components/MultiSelectionMenu.tsx'
+import SelectAllButton from '../components/SelectAllButton.tsx'
+import SelectMenu from '../components/SelectMenu.tsx'
+import SelectionCount from '../components/SelectionCount.tsx'
 import type { Image } from '../db.ts'
+import DeleteSelection from './DeleteSelection.tsx'
 import UploadImage from './UploadImage.tsx'
+import { sendJSON, setToArray } from './utils.ts'
 
 export default function Images({
   images,
   albumId,
+  options,
 }: {
   images: Image[]
   albumId: number
+  options: Parameters<typeof SelectMenu>[0]['options']
 }) {
   const [selectedIds, setSelectedIds] = useState(new Set<number>())
+  const [open, setOpen] = useState(false)
+  const [selectedAlbum, setSelectedAlbum] = useState(albumId)
   const allSelected = selectedIds.size === images.length
 
   function checkboxOnChange(id: number) {
@@ -37,6 +47,15 @@ export default function Images({
     setSelectedIds(next)
   }
 
+  const moveToAlbum = sendJSON('image', 'PUT', {
+    ids: setToArray(selectedIds),
+    albumId: selectedAlbum,
+  })
+
+  function handleChangeSelect(event: JSX.TargetedEvent<HTMLSelectElement>) {
+    setSelectedAlbum(Number(event.currentTarget.value))
+  }
+
   return (
     <>
       <Grid>
@@ -56,16 +75,38 @@ export default function Images({
         ))}
       </Grid>
       <FloatingMenu>
-        <MultiSelectionMenu
-          selectedIds={selectedIds}
+        <SelectionCount selectedIds={selectedIds} />
+        <SelectAllButton
           allSelected={allSelected}
-          buttonOnClick={buttonOnClick}
+          onClick={buttonOnClick}
           isNone={images.length === 0}
-          target="image"
-        >
+        />
+        {selectedIds.size > 0 ? (
+          <div class="flex gap-2">
+            <FloatButton
+              label="Move"
+              iconName="send"
+              onClick={() => setOpen(true)}
+            />
+            <DeleteSelection target="image" selectedIds={selectedIds} />
+          </div>
+        ) : (
           <UploadImage albumId={albumId} />
-        </MultiSelectionMenu>
+        )}
       </FloatingMenu>
+      <Dialog
+        open={open}
+        close={() => setOpen(false)}
+        title="Move to album"
+        onConfirm={moveToAlbum}
+      >
+        <SelectMenu
+          label="Album"
+          options={options}
+          value={selectedAlbum}
+          onChange={handleChangeSelect}
+        />
+      </Dialog>
     </>
   )
 }

@@ -4,7 +4,7 @@ import Form from '../components/Form.tsx'
 import InfoButton from '../components/InfoButton.tsx'
 import Input from '../components/Input.tsx'
 import type { Album } from '../db.ts'
-import { deleteContent } from '../utils.ts'
+import { sendJSON } from './utils.ts'
 
 export default function AlbumInfo({
   album,
@@ -21,7 +21,7 @@ export default function AlbumInfo({
     formRef.current?.submit()
   }
 
-  const deleteSubmit = deleteContent('album', { id: album.id })
+  const deleteSubmit = sendJSON('album', 'DELETE', { id: album.id })
 
   return (
     <>

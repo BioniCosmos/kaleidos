@@ -5,7 +5,7 @@ import InfoButton from '../components/InfoButton.tsx'
 import Input from '../components/Input.tsx'
 import SelectMenu from '../components/SelectMenu.tsx'
 import type { Image } from '../db.ts'
-import { deleteContent } from '../utils.ts'
+import { sendJSON } from './utils.ts'
 
 export default function ImageInfo({
   image,
@@ -22,7 +22,7 @@ export default function ImageInfo({
     formRef.current?.submit()
   }
 
-  const deleteSubmit = deleteContent('image', { id: image.id })
+  const deleteSubmit = sendJSON('image', 'DELETE', { id: image.id })
 
   return (
     <>

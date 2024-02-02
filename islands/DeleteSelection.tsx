@@ -1,9 +1,8 @@
 import type { JSX } from 'preact'
 import { useState } from 'preact/hooks'
-import Button from '../components/Button.tsx'
 import Dialog from '../components/Dialog.tsx'
-import Icon from '../components/Icon.tsx'
-import { deleteContent } from '../utils.ts'
+import FloatButton from '../components/FloatButton.tsx'
+import { sendJSON, setToArray } from './utils.ts'
 
 interface CommonProps {
   target: 'image' | 'album'
@@ -33,8 +32,9 @@ export default function DeleteSelection({
     setOpen(true)
   }
 
-  const submit = deleteContent(
+  const submit = sendJSON(
     target,
+    'DELETE',
     'id' in props
       ? { id: props.id }
       : { selectedIds: setToArray(props.selectedIds) }
@@ -42,17 +42,12 @@ export default function DeleteSelection({
 
   return (
     <>
-      <Button
+      <FloatButton
+        label="Delete"
         color="red"
-        class="flex gap-3 items-center justify-center"
+        iconName="trash"
         onClick={openDialog}
-      >
-        <Icon
-          name="trash"
-          options={{ width: 18, height: 18, 'stroke-width': 3 }}
-        />
-        <div>Delete</div>
-      </Button>
+      />
       <Dialog
         open={open}
         title="Warning!"
@@ -63,8 +58,4 @@ export default function DeleteSelection({
       </Dialog>
     </>
   )
-}
-
-function setToArray<T>(set: Set<T>) {
-  return Array.from(set.values())
 }

@@ -3,8 +3,10 @@ import { useState } from 'preact/hooks'
 import Checkbox from '../components/Checkbox.tsx'
 import FloatingMenu from '../components/FloatingMenu.tsx'
 import Grid from '../components/Grid.tsx'
-import MultiSelectionMenu from '../components/MultiSelectionMenu.tsx'
+import SelectAllButton from '../components/SelectAllButton.tsx'
+import SelectionCount from '../components/SelectionCount.tsx'
 import type { Album } from '../db.ts'
+import DeleteSelection from './DeleteSelection.tsx'
 import NewAlbum from './NewAlbum.tsx'
 
 export default function Albums({ albums }: { albums: Album[] }) {
@@ -48,15 +50,17 @@ export default function Albums({ albums }: { albums: Album[] }) {
         ))}
       </Grid>
       <FloatingMenu>
-        <MultiSelectionMenu
-          selectedIds={selectedIds}
+        <SelectionCount selectedIds={selectedIds} />
+        <SelectAllButton
           allSelected={allSelected}
-          buttonOnClick={buttonOnClick}
+          onClick={buttonOnClick}
           isNone={albums.length === 0}
-          target="album"
-        >
+        />
+        {selectedIds.size > 0 ? (
+          <DeleteSelection target="album" selectedIds={selectedIds} />
+        ) : (
           <NewAlbum />
-        </MultiSelectionMenu>
+        )}
       </FloatingMenu>
     </>
   )

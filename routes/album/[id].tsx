@@ -3,7 +3,8 @@ import Pagination from '../../components/Pagination.tsx'
 import { db, type Album, type Image } from '../../db.ts'
 import AlbumInfo from '../../islands/AlbumInfo.tsx'
 import Images from '../../islands/Images.tsx'
-import { redirect } from '../../utils.ts'
+import { getAlbumOptions, redirect } from '../../utils.ts'
+import type { State } from '../_middleware.tsx'
 
 export const handler: Handlers = {
   async POST(req, ctx) {
@@ -14,7 +15,7 @@ export const handler: Handlers = {
   },
 }
 
-export default defineRoute((_req, ctx) => {
+export default defineRoute<State>((_req, ctx) => {
   const album = db
     .queryEntries<Album>('SELECT * FROM albums where id = :id', ctx.params)
     .at(0)
@@ -36,13 +37,19 @@ export default defineRoute((_req, ctx) => {
     [album.id, (page - 1) * 15]
   )
 
+  const { id: userId } = ctx.state.user
+
   return (
     <>
       <div class="mb-6 flex items-center flex-col gap-4">
         <h2 class="text-2xl font-bold">{album.name}</h2>
         <AlbumInfo album={album} count={count} />
       </div>
-      <Images images={images} albumId={album.id} />
+      <Images
+        images={images}
+        albumId={album.id}
+        options={getAlbumOptions(userId)}
+      />
       <Pagination
         currentPage={page}
         totalPages={totalPages}

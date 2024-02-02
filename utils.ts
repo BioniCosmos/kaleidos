@@ -4,7 +4,7 @@ import {
   jwtVerify as verify,
 } from 'https://deno.land/x/jose@v5.2.0/index.ts'
 import ShortUniqueId from 'https://esm.sh/short-unique-id@5.0.3'
-import type { User } from './db.ts'
+import { db, type Album, type User } from './db.ts'
 
 export function redirect(path: string) {
   return new Response(null, {
@@ -92,11 +92,11 @@ export function fileNameWithSuffix(fileName: string) {
 
 export const randomId = new ShortUniqueId({ length: 10 }).randomUUID
 
-export function deleteContent(target: 'album' | 'image', value: unknown) {
-  return () =>
-    fetch(`/${target}`, {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json; charset=utf-8' },
-      body: JSON.stringify(value),
-    }).then((value) => location.assign(value.url))
+export function getAlbumOptions(userId: string) {
+  return db
+    .queryEntries<Pick<Album, 'id' | 'name'>>(
+      'SELECT id, name FROM albums WHERE userId = :userId',
+      { userId }
+    )
+    .map(({ id, name }) => ({ value: id, name }))
 }
