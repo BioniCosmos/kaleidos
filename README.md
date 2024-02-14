@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="static/title.png" />
+  <img src="static/title.webp" />
   <h1>Kaleidos</h1>
 </div>
 
