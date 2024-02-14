@@ -1,7 +1,8 @@
 import type { Handlers } from '$fresh/server.ts'
+import type { Album } from '../../db.ts'
 import { db } from '../../db.ts'
 import { redirect } from '../../utils.ts'
-import type { State } from '../_middleware.tsx'
+import type { State } from '../_middleware.ts'
 import { deleteImage } from '../image/index.ts'
 
 export const handler: Handlers<unknown, State> = {
@@ -15,10 +16,21 @@ export const handler: Handlers<unknown, State> = {
     return redirect(`/album/${id}`)
   },
 
-  async DELETE(req) {
+  async DELETE(req, ctx) {
     const { id, selectedIds }: { id: number; selectedIds?: number[] } =
       await req.json()
     const ids = selectedIds ?? [id]
+    const userIds = db.queryEntries<Pick<Album, 'userId'>>(
+      `SELECT userId FROM albums WHERE id IN (${ids.join(', ')})`
+    )
+    const { id: userId, isAdmin } = ctx.state.user
+    if (
+      userIds.some(({ userId: albumUserId }) => albumUserId !== userId) &&
+      !isAdmin
+    ) {
+      return redirect('/error?message=No access')
+    }
+
     const jobs = ids.map((id) => deleteAlbum(id))
     await Promise.all(jobs)
     return redirect('/')

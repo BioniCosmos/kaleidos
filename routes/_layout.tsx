@@ -1,6 +1,6 @@
 import { type PageProps } from '$fresh/server.ts'
 import Icon from '../components/Icon.tsx'
-import type { State } from './_middleware.tsx'
+import type { State } from './_middleware.ts'
 
 export default function Layout({
   route,

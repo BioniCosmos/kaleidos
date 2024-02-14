@@ -2,7 +2,7 @@ import type { Handlers } from '$fresh/server.ts'
 import { ensureFile, exists, existsSync } from '$std/fs/mod.ts'
 import { basename, dirname, extname, join } from '$std/path/mod.ts'
 import sharp from 'sharp'
-import { db, type Image } from '../../db.ts'
+import { db, type Album, type Image } from '../../db.ts'
 import {
   fileNameWithSuffix,
   getPath,
@@ -10,7 +10,7 @@ import {
   parseFileName,
   redirect,
 } from '../../utils.ts'
-import type { State } from '../_middleware.tsx'
+import type { State } from '../_middleware.ts'
 
 export const handler: Handlers<unknown, State> = {
   async POST(req, ctx) {
@@ -25,20 +25,52 @@ export const handler: Handlers<unknown, State> = {
     return redirect(`/album/${albumId}`)
   },
 
-  async DELETE(req) {
+  async DELETE(req, ctx) {
     const { id, selectedIds }: { id: number; selectedIds?: number[] } =
       await req.json()
     const ids = selectedIds ?? [id]
     const jobs = ids.map((id) => deleteImage(id))
+    const userIds = db.queryEntries<Pick<Image, 'userId'>>(
+      `SELECT userId FROM images WHERE id IN (${ids.join(', ')})`
+    )
+    const { id: userId, isAdmin } = ctx.state.user
+    if (
+      userIds.some(({ userId: imageUserId }) => imageUserId !== userId) &&
+      !isAdmin
+    ) {
+      return redirect('/error?message=No access')
+    }
+
     const [albumId] = await Promise.all(jobs)
     return redirect(`/album/${albumId}`)
   },
 
-  async PUT(req) {
+  async PUT(req, ctx) {
     const { ids, albumId }: { ids: number[]; albumId: number } =
       await req.json()
+    const joinedIds = ids.join(', ')
+
+    const userIds = db.queryEntries<Pick<Image, 'userId'>>(
+      `SELECT userId FROM images WHERE id IN (${joinedIds})`
+    )
+    const { id: userId, isAdmin } = ctx.state.user
+    if (
+      userIds.some(({ userId: imageUserId }) => imageUserId !== userId) &&
+      !isAdmin
+    ) {
+      return redirect('/error?message=No access')
+    }
+
+    const [{ userId: albumUserId }] = db.queryEntries<Pick<Album, 'userId'>>(
+      'SELECT userId FROM albums WHERE id = ?',
+      [albumId]
+    )
+    if (albumUserId !== userId && !isAdmin) {
+      return redirect('/error?message=No access')
+    }
+
     db.query(
-      `UPDATE images SET albumId = :albumId WHERE id IN (${ids.join(', ')})`,
+      `UPDATE images SET albumId = :albumId WHERE id IN (${joinedIds})`,
       { albumId }
     )
     return redirect(`/album/${albumId}`)

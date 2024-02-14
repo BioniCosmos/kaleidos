@@ -2,7 +2,7 @@ import type { PageProps } from '$fresh/server.ts'
 import Button from '../../components/Button.tsx'
 import Form from '../../components/Form.tsx'
 import Input from '../../components/Input.tsx'
-import type { State } from '../_middleware.tsx'
+import type { State } from '../_middleware.ts'
 
 export default function Settings({ state }: PageProps<unknown, State>) {
   const { name } = state.user

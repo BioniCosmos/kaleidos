@@ -1,7 +1,7 @@
 import type { Handlers } from '$fresh/server.ts'
 import { db } from '../../db.ts'
 import { redirect } from '../../utils.ts'
-import type { State } from '../_middleware.tsx'
+import type { State } from '../_middleware.ts'
 
 export const handler: Handlers<unknown, State> = {
   async POST(req, ctx) {

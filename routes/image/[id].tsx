@@ -6,14 +6,30 @@ import { db, getAlbumOptions, type Album, type Image } from '../../db.ts'
 import ImageInfo from '../../islands/ImageInfo.tsx'
 import ImageLink from '../../islands/ImageLink.tsx'
 import { redirect } from '../../utils.ts'
-import type { State } from '../_middleware.tsx'
+import type { State } from '../_middleware.ts'
 
-export const handler: Handlers = {
+export const handler: Handlers<unknown, State> = {
   async POST(req, ctx) {
     const formData = await req.formData()
     const name = formData.get('name') as string
     const albumId = Number(formData.get('albumId') as string)
     const { id } = ctx.params
+    const [{ userId: imageUserId }] = db.queryEntries<Pick<Image, 'userId'>>(
+      'SELECT userId FROM images WHERE id = :id',
+      { id }
+    )
+    const { id: userId, isAdmin } = ctx.state.user
+    if (imageUserId !== userId && !isAdmin) {
+      return redirect('/error?message=No access')
+    }
+
+    const [{ userId: albumUserId }] = db.queryEntries<Pick<Album, 'userId'>>(
+      'SELECT userId FROM albums WHERE id = ?',
+      [albumId]
+    )
+    if (albumUserId !== userId && !isAdmin) {
+      return redirect('/error?message=No access')
+    }
 
     db.query(
       'UPDATE images SET name = :name, albumId = :albumId WHERE id = :id',
@@ -31,11 +47,15 @@ export default defineRoute<State>((_req, ctx) => {
     return ctx.renderNotFound()
   }
 
+  const { name: userName, id: userId, isAdmin } = ctx.state.user
+  if (image.userId !== userId && !isAdmin) {
+    return redirect('/error?message=No access')
+  }
+
   const albumName = db.queryEntries<Pick<Album, 'name'>>(
-    'SELECT name from albums where id = ?',
+    'SELECT name FROM albums WHERE id = ?',
     [image.albumId]
   )[0].name
-  const { name: userName, id: userId } = ctx.state.user
 
   const info = (
     [

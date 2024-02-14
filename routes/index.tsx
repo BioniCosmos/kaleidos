@@ -1,7 +1,7 @@
 import { type PageProps } from '$fresh/server.ts'
 import { db, type Album } from '../db.ts'
 import Albums from '../islands/Albums.tsx'
-import type { State } from './_middleware.tsx'
+import type { State } from './_middleware.ts'
 
 export default function Index({ state }: PageProps<unknown, State>) {
   const { id: userId } = state.user

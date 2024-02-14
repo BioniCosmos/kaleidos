@@ -4,12 +4,21 @@ import { db, getAlbumOptions, type Album, type Image } from '../../db.ts'
 import AlbumInfo from '../../islands/AlbumInfo.tsx'
 import Images from '../../islands/Images.tsx'
 import { redirect } from '../../utils.ts'
-import type { State } from '../_middleware.tsx'
+import type { State } from '../_middleware.ts'
 
-export const handler: Handlers = {
+export const handler: Handlers<unknown, State> = {
   async POST(req, ctx) {
     const name = (await req.formData()).get('name') as string
     const { id } = ctx.params
+    const { id: userId, isAdmin } = ctx.state.user
+    const [{ userId: albumUserId }] = db.queryEntries<Pick<Album, 'userId'>>(
+      'SELECT userId FROM albums WHERE id = :id',
+      { id }
+    )
+    if (albumUserId !== userId && !isAdmin) {
+      return redirect('/error?message=No access')
+    }
+
     db.query('UPDATE albums SET name = :name WHERE id = :id', { name, id })
     return redirect(req.url)
   },
@@ -17,13 +26,18 @@ export const handler: Handlers = {
 
 export default defineRoute<State>((_req, ctx) => {
   const album = db
-    .queryEntries<Album>('SELECT * FROM albums where id = :id', ctx.params)
+    .queryEntries<Album>('SELECT * FROM albums WHERE id = :id', ctx.params)
     .at(0)
   if (album === undefined) {
     return ctx.renderNotFound()
   }
 
-  const count = db.query('SELECT count(*) FROM images where albumId = ?', [
+  const { id: userId, isAdmin } = ctx.state.user
+  if (album.userId !== userId && !isAdmin) {
+    return redirect('/error?message=No access')
+  }
+
+  const count = db.query('SELECT count(*) FROM images WHERE albumId = ?', [
     album.id,
   ])[0][0] as number
   const page = Number(ctx.url.searchParams.get('page') ?? '1')
@@ -33,11 +47,9 @@ export default defineRoute<State>((_req, ctx) => {
   }
 
   const images = db.queryEntries<Image>(
-    'SELECT * FROM images where albumId = ? LIMIT 15 OFFSET ?',
+    'SELECT * FROM images WHERE albumId = ? LIMIT 15 OFFSET ?',
     [album.id, (page - 1) * 15]
   )
-
-  const { id: userId } = ctx.state.user
 
   return (
     <>

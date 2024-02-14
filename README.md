@@ -13,6 +13,6 @@
 - [ ] Dark theme
 - [ ] i18n
 - [ ] Config files or environment variables
-- [ ] Permission control
+- [x] Permission control
 - [x] Direct/shared links
 - [ ] Dynamic page titles
