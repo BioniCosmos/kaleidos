@@ -3,6 +3,7 @@ import { ensureFile, exists } from '$std/fs/mod.ts'
 import { contentType } from '$std/media_types/mod.ts'
 import { join } from '$std/path/mod.ts'
 import sharp from 'sharp'
+import conf from '../config.ts'
 import { parseFileName } from '../utils.ts'
 
 export const config: RouteConfig = {
@@ -18,9 +19,9 @@ export const handler: Handlers = {
       format !== null &&
       format !== ext &&
       (format === 'webp' || format === 'avif')
-    const rawPath = join(Deno.cwd(), 'images/raw/', path)
+    const rawPath = join(conf.workingDir, 'images/raw/', path)
     const actualPath = needConvert
-      ? join(Deno.cwd(), 'images/tmp/', `${path}.${format}`)
+      ? join(conf.workingDir, 'images/tmp/', `${path}.${format}`)
       : rawPath
     const type = contentType(needConvert ? format : ext)
     if (type === undefined) {

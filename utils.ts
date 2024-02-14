@@ -4,6 +4,7 @@ import {
   jwtVerify as verify,
 } from 'https://deno.land/x/jose@v5.2.0/index.ts'
 import ShortUniqueId from 'https://esm.sh/short-unique-id@5.0.3'
+import config from './config.ts'
 import type { User } from './db.ts'
 
 export function redirect(path: string) {
@@ -13,9 +14,7 @@ export function redirect(path: string) {
   })
 }
 
-const secret = new TextEncoder().encode(
-  'Eternal-Commotion6-Willed-Blurred-Unlikable'
-)
+const secret = new TextEncoder().encode(config.secret)
 
 export async function jwtSign(user: User) {
   const date = new Date()

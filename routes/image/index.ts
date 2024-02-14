@@ -2,6 +2,7 @@ import type { Handlers } from '$fresh/server.ts'
 import { ensureFile, exists, existsSync } from '$std/fs/mod.ts'
 import { basename, dirname, extname, join } from '$std/path/mod.ts'
 import sharp from 'sharp'
+import config from '../../config.ts'
 import { db, type Album, type Image } from '../../db.ts'
 import {
   fileNameWithSuffix,
@@ -82,7 +83,7 @@ async function saveImage(imageFile: File, userId: string, albumId: number) {
   const time = getTime()
   const date = time.time
   const needSuffix = await exists(
-    join(Deno.cwd(), 'images/raw/', getPath(imageFile.name, time))
+    join(config.workingDir, 'images/raw/', getPath(imageFile.name, time))
   )
   const path = getPath(
     needSuffix ? fileNameWithSuffix(imageFile.name) : imageFile.name,
@@ -90,7 +91,7 @@ async function saveImage(imageFile: File, userId: string, albumId: number) {
   )
   const size = imageFile.size
 
-  const actualPath = join(Deno.cwd(), 'images/raw/', path)
+  const actualPath = join(config.workingDir, 'images/raw/', path)
   await ensureFile(actualPath)
   const image = sharp(await imageFile.arrayBuffer())
   const { orientation } = await image.metadata()
@@ -124,10 +125,10 @@ export function deleteImage(id: number) {
       { id }
     )[0]
 
-    const rawPath = join(Deno.cwd(), 'images/raw/', path)
+    const rawPath = join(config.workingDir, 'images/raw/', path)
     Deno.removeSync(rawPath)
 
-    const tmpPath = join(Deno.cwd(), 'images/tmp/', path)
+    const tmpPath = join(config.workingDir, 'images/tmp/', path)
     const tmpDir = dirname(tmpPath)
     if (existsSync(tmpDir)) {
       Array.from(Deno.readDirSync(dirname(tmpPath)))
