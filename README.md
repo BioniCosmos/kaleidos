@@ -15,4 +15,4 @@
 - [x] Config files or environment variables
 - [x] Permission control
 - [x] Direct/shared links
-- [ ] Dynamic page titles
+- [x] Dynamic page titles

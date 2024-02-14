@@ -1,5 +1,6 @@
 import { defineRoute, type Handlers } from '$fresh/server.ts'
 import Pagination from '../../components/Pagination.tsx'
+import Title from '../../components/Title.tsx'
 import { db, getAlbumOptions, type Album, type Image } from '../../db.ts'
 import AlbumInfo from '../../islands/AlbumInfo.tsx'
 import Images from '../../islands/Images.tsx'
@@ -53,6 +54,7 @@ export default defineRoute<State>((_req, ctx) => {
 
   return (
     <>
+      <Title>{album.name}</Title>
       <div class="mb-6 flex items-center flex-col gap-4">
         <h2 class="text-2xl font-bold">{album.name}</h2>
         <AlbumInfo album={album} count={count} />

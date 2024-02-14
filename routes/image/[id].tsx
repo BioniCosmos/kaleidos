@@ -2,6 +2,7 @@ import { defineRoute, type Handlers } from '$fresh/server.ts'
 import { join } from '$std/path/mod.ts'
 import type { FeatherIconNames } from 'feather-icons'
 import Icon from '../../components/Icon.tsx'
+import Title from '../../components/Title.tsx'
 import { db, getAlbumOptions, type Album, type Image } from '../../db.ts'
 import ImageInfo from '../../islands/ImageInfo.tsx'
 import ImageLink from '../../islands/ImageLink.tsx'
@@ -71,6 +72,7 @@ export default defineRoute<State>((_req, ctx) => {
 
   return (
     <>
+      <Title>{image.name}</Title>
       <div class="mb-6 flex items-center flex-col gap-4">
         <h2 class="text-2xl font-bold">{image.name}</h2>
         <ImageInfo image={image} options={getAlbumOptions(userId)} />

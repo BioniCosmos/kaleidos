@@ -1,5 +1,6 @@
 import { type PageProps } from '$fresh/server.ts'
 import Icon from '../components/Icon.tsx'
+import config from '../config.ts'
 import type { State } from './_middleware.ts'
 
 export default function Layout({
@@ -12,7 +13,7 @@ export default function Layout({
     <>
       <header class="bg-gray-300 px-4 py-2 flex items-center justify-between">
         <a href="/" class="text-xl font-bold">
-          Kalaidos
+          {config.title}
         </a>
         {user !== undefined && (
           <div class="flex items-center gap-6">

@@ -4,7 +4,6 @@ import {
   jwtVerify as verify,
 } from 'https://deno.land/x/jose@v5.2.0/index.ts'
 import ShortUniqueId from 'https://esm.sh/short-unique-id@5.0.3'
-import config from './config.ts'
 import type { User } from './db.ts'
 
 export function redirect(path: string) {
@@ -14,14 +13,21 @@ export function redirect(path: string) {
   })
 }
 
-const secret = new TextEncoder().encode(config.secret)
+let _secret: Uint8Array | undefined
+const secret = async () => {
+  if (_secret === undefined) {
+    const config = (await import('./config.ts')).default
+    _secret = new TextEncoder().encode(config.secret)
+  }
+  return _secret
+}
 
 export async function jwtSign(user: User) {
   const date = new Date()
   const token = await new SignJWT({ sub: user.id })
     .setProtectedHeader({ typ: 'JWT', alg: 'HS256' })
     .setExpirationTime(date.setDate(date.getDate() + 1))
-    .sign(secret)
+    .sign(await secret())
   return token
 }
 
@@ -29,7 +35,7 @@ export async function jwtVerify(token: string) {
   try {
     const {
       payload: { sub },
-    } = await verify(token, secret)
+    } = await verify(token, await secret())
     if (sub === undefined) {
       return null
     }

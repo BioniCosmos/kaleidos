@@ -1,4 +1,5 @@
 import { type PageProps } from '$fresh/server.ts'
+import config from '../config.ts'
 
 export default function App({ Component }: PageProps) {
   return (
@@ -6,7 +7,7 @@ export default function App({ Component }: PageProps) {
       <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Kaleidos</title>
+        <title>{config.title}</title>
         <link rel="icon" href="/favicon.png" />
         <link rel="stylesheet" href="/styles.css" />
       </head>

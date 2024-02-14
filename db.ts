@@ -1,4 +1,6 @@
+import { join } from '$std/path/mod.ts'
 import { DB } from 'sqlite'
+import config from './config.ts'
 
 export type Image = {
   id: number
@@ -60,7 +62,7 @@ export function createUserTable(db: DB) {
 `)
 }
 
-export const db = new DB('./kaleidos.db')
+export const db = new DB(join(config.workingDir, 'kaleidos.db'))
 
 createImageTable(db)
 createAlbumTable(db)

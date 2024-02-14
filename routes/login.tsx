@@ -3,6 +3,7 @@ import { verify } from 'argon2'
 import Button from '../components/Button.tsx'
 import Form from '../components/Form.tsx'
 import Input from '../components/Input.tsx'
+import Title from '../components/Title.tsx'
 import { db, type User } from '../db.ts'
 import { jwtSign, redirect } from '../utils.ts'
 
@@ -35,10 +36,13 @@ export const handler: Handlers = {
 
 export default function Login() {
   return (
-    <Form method="post" class="bg-white p-8 rounded shadow">
-      <Input label="Id" name="id" required />
-      <Input label="Password" type="password" name="password" required />
-      <Button>Login</Button>
-    </Form>
+    <>
+      <Title>Login</Title>
+      <Form method="post" class="bg-white p-8 rounded shadow">
+        <Input label="Id" name="id" required />
+        <Input label="Password" type="password" name="password" required />
+        <Button>Login</Button>
+      </Form>
+    </>
   )
 }
