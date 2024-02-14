@@ -1,9 +1,11 @@
 import { defineRoute, type Handlers } from '$fresh/server.ts'
 import { join } from '$std/path/mod.ts'
+import type { FeatherIconNames } from 'feather-icons'
 import Icon from '../../components/Icon.tsx'
-import { db, type Album, type Image } from '../../db.ts'
+import { db, getAlbumOptions, type Album, type Image } from '../../db.ts'
 import ImageInfo from '../../islands/ImageInfo.tsx'
-import { getAlbumOptions, redirect } from '../../utils.ts'
+import ImageLink from '../../islands/ImageLink.tsx'
+import { redirect } from '../../utils.ts'
 import type { State } from '../_middleware.tsx'
 
 export const handler: Handlers = {
@@ -35,17 +37,17 @@ export default defineRoute<State>((_req, ctx) => {
   )[0].name
   const { name: userName, id: userId } = ctx.state.user
 
-  const info = [
+  const info = (
     [
-      <Icon name="calendar" options={{ width: 20, height: 20 }} />,
-      new Date(image.date).toLocaleString(),
-    ],
-    [<Icon name="folder" options={{ width: 20, height: 20 }} />, albumName],
-    [
-      <Icon name="user" options={{ width: 20, height: 20 }} />,
-      userName !== '' ? userName : image.userId,
-    ],
-  ]
+      ['calendar', new Date(image.date).toLocaleString()],
+      ['folder', albumName],
+      ['user', userName !== '' ? userName : image.userId],
+    ] satisfies [FeatherIconNames, string][]
+  ).map(([iconName, value]) => ({
+    icon: <Icon name={iconName} options={{ width: 20, height: 20 }} />,
+    value,
+  }))
+  const rawPath = join('/images', image.path)
 
   return (
     <>
@@ -53,17 +55,21 @@ export default defineRoute<State>((_req, ctx) => {
         <h2 class="text-2xl font-bold">{image.name}</h2>
         <ImageInfo image={image} options={getAlbumOptions(userId)} />
       </div>
-      <a href={join('/images', image.path)}>
-        <img src={join('/images', image.path)} class="max-h-[75vh] mx-auto" />
+      <a href={rawPath}>
+        <img src={rawPath} class="max-h-[75vh] mx-auto" />
       </a>
-      <ul class="space-y-3 mt-6 text-sm text-gray-700">
-        {info.map((item) => (
-          <li class="flex gap-3">
-            {item[0]}
-            <div class="text-gray-500">{item[1]}</div>
-          </li>
-        ))}
-      </ul>
+      <div class="space-y-4 text-sm mt-6">
+        <ul class="space-y-3 text-gray-700">
+          {info.map(({ icon, value }) => (
+            <li class="flex gap-3">
+              {icon}
+              <div class="text-gray-500">{value}</div>
+            </li>
+          ))}
+        </ul>
+        <hr />
+        <ImageLink path={rawPath} name={image.name} />
+      </div>
     </>
   )
 })

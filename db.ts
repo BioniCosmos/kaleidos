@@ -65,3 +65,12 @@ export const db = new DB('./kaleidos.db')
 createImageTable(db)
 createAlbumTable(db)
 createUserTable(db)
+
+export function getAlbumOptions(userId: string) {
+  return db
+    .queryEntries<Pick<Album, 'id' | 'name'>>(
+      'SELECT id, name FROM albums WHERE userId = :userId',
+      { userId }
+    )
+    .map(({ id, name }) => ({ value: id, name }))
+}

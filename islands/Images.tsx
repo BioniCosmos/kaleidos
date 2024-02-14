@@ -10,9 +10,9 @@ import SelectAllButton from '../components/SelectAllButton.tsx'
 import SelectMenu from '../components/SelectMenu.tsx'
 import SelectionCount from '../components/SelectionCount.tsx'
 import type { Image } from '../db.ts'
+import { sendJSON, setToArray } from '../utils.ts'
 import DeleteSelection from './DeleteSelection.tsx'
 import UploadImage from './UploadImage.tsx'
-import { sendJSON, setToArray } from './utils.ts'
 
 export default function Images({
   images,

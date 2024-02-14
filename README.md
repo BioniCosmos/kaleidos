@@ -14,5 +14,5 @@
 - [ ] i18n
 - [ ] Config files or environment variables
 - [ ] Permission control
-- [ ] Direct/shared links
+- [x] Direct/shared links
 - [ ] Dynamic page titles
