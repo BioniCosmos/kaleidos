@@ -1,6 +1,4 @@
-import { join } from '$std/path/mod.ts'
 import { DB } from 'sqlite'
-import config from './config.ts'
 
 export type Image = {
   id: number
@@ -28,47 +26,41 @@ export type User = {
 
 export function createImageTable(db: DB) {
   db.execute(`
-  CREATE TABLE IF NOT EXISTS images (
-    id INTEGER PRIMARY KEY NOT NULL,
-    name TEXT NOT NULL,
-    ext TEXT NOT NULL,
-    date INTEGER NOT NULL,
-    userId TEXT NOT NULL,
-    albumId INTEGER NOT NULL,
-    path TEXT NOT NULL,
-    size INTEGER NOT NULL
-  )
-`)
+    CREATE TABLE IF NOT EXISTS images(
+      id      INTEGER PRIMARY KEY NOT NULL,
+      name    TEXT NOT NULL,
+      ext     TEXT NOT NULL,
+      date    INTEGER NOT NULL,
+      userId  TEXT NOT NULL REFERENCES users,
+      albumId INTEGER NOT NULL REFERENCES albums,
+      path    TEXT NOT NULL,
+      size    INTEGER NOT NULL
+    )
+  `)
 }
 
 export function createAlbumTable(db: DB) {
   db.execute(`
-  CREATE TABLE IF NOT EXISTS albums (
-    id INTEGER PRIMARY KEY NOT NULL,
-    name TEXT NOT NULL,
-    userId TEXT NOT NULL
-  )
-`)
+    CREATE TABLE IF NOT EXISTS albums(
+      id     INTEGER PRIMARY KEY NOT NULL,
+      name   TEXT NOT NULL,
+      userId TEXT NOT NULL REFERENCES users
+    )
+  `)
 }
 
 export function createUserTable(db: DB) {
   db.execute(`
-  CREATE TABLE IF NOT EXISTS users (
-    id TEXT PRIMARY KEY NOT NULL,
-    password TEXT NOT NULL,
-    name TEXT NOT NULL,
-    isAdmin BOOL NOT NULL DEFAULT FALSE
-  )
-`)
+    CREATE TABLE IF NOT EXISTS users(
+      id       TEXT PRIMARY KEY NOT NULL,
+      password TEXT NOT NULL,
+      name     TEXT NOT NULL,
+      isAdmin  INTEGER NOT NULL DEFAULT FALSE
+    )
+  `)
 }
 
-export const db = new DB(join(config.workingDir, 'kaleidos.db'))
-
-createImageTable(db)
-createAlbumTable(db)
-createUserTable(db)
-
-export function getAlbumOptions(userId: string) {
+export function getAlbumOptions(db: DB, userId: string) {
   return db
     .queryEntries<Pick<Album, 'id' | 'name'>>(
       'SELECT id, name FROM albums WHERE userId = :userId',

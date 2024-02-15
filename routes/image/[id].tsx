@@ -3,7 +3,7 @@ import { join } from '$std/path/mod.ts'
 import type { FeatherIconNames } from 'feather-icons'
 import Icon from '../../components/Icon.tsx'
 import Title from '../../components/Title.tsx'
-import { db, getAlbumOptions, type Album, type Image } from '../../db.ts'
+import { getAlbumOptions, type Album, type Image } from '../../db.ts'
 import ImageInfo from '../../islands/ImageInfo.tsx'
 import ImageLink from '../../islands/ImageLink.tsx'
 import { redirect } from '../../utils.ts'
@@ -15,11 +15,14 @@ export const handler: Handlers<unknown, State> = {
     const name = formData.get('name') as string
     const albumId = Number(formData.get('albumId') as string)
     const { id } = ctx.params
+
+    const { db, user } = ctx.state
+    const { id: userId, isAdmin } = user
+
     const [{ userId: imageUserId }] = db.queryEntries<Pick<Image, 'userId'>>(
       'SELECT userId FROM images WHERE id = :id',
       { id }
     )
-    const { id: userId, isAdmin } = ctx.state.user
     if (imageUserId !== userId && !isAdmin) {
       return redirect('/error?message=No access')
     }
@@ -41,6 +44,9 @@ export const handler: Handlers<unknown, State> = {
 }
 
 export default defineRoute<State>((_req, ctx) => {
+  const { db, user } = ctx.state
+  const { name: userName, id: userId, isAdmin } = user
+
   const image = db
     .queryEntries<Image>('SELECT * FROM images WHERE id = :id', ctx.params)
     .at(0)
@@ -48,7 +54,6 @@ export default defineRoute<State>((_req, ctx) => {
     return ctx.renderNotFound()
   }
 
-  const { name: userName, id: userId, isAdmin } = ctx.state.user
   if (image.userId !== userId && !isAdmin) {
     return redirect('/error?message=No access')
   }
@@ -75,7 +80,7 @@ export default defineRoute<State>((_req, ctx) => {
       <Title>{image.name}</Title>
       <div class="mb-6 flex items-center flex-col gap-4">
         <h2 class="text-2xl font-bold">{image.name}</h2>
-        <ImageInfo image={image} options={getAlbumOptions(userId)} />
+        <ImageInfo image={image} options={getAlbumOptions(db, userId)} />
       </div>
       <a href={rawPath}>
         <img src={rawPath} class="max-h-[75vh] mx-auto" />

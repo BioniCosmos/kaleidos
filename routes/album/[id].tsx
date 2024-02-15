@@ -1,7 +1,7 @@
 import { defineRoute, type Handlers } from '$fresh/server.ts'
 import Pagination from '../../components/Pagination.tsx'
 import Title from '../../components/Title.tsx'
-import { db, getAlbumOptions, type Album, type Image } from '../../db.ts'
+import { getAlbumOptions, type Album, type Image } from '../../db.ts'
 import AlbumInfo from '../../islands/AlbumInfo.tsx'
 import Images from '../../islands/Images.tsx'
 import { redirect } from '../../utils.ts'
@@ -11,7 +11,10 @@ export const handler: Handlers<unknown, State> = {
   async POST(req, ctx) {
     const name = (await req.formData()).get('name') as string
     const { id } = ctx.params
-    const { id: userId, isAdmin } = ctx.state.user
+
+    const { db, user } = ctx.state
+    const { id: userId, isAdmin } = user
+
     const [{ userId: albumUserId }] = db.queryEntries<Pick<Album, 'userId'>>(
       'SELECT userId FROM albums WHERE id = :id',
       { id }
@@ -26,6 +29,9 @@ export const handler: Handlers<unknown, State> = {
 }
 
 export default defineRoute<State>((_req, ctx) => {
+  const { db, user } = ctx.state
+  const { id: userId, isAdmin } = user
+
   const album = db
     .queryEntries<Album>('SELECT * FROM albums WHERE id = :id', ctx.params)
     .at(0)
@@ -33,7 +39,6 @@ export default defineRoute<State>((_req, ctx) => {
     return ctx.renderNotFound()
   }
 
-  const { id: userId, isAdmin } = ctx.state.user
   if (album.userId !== userId && !isAdmin) {
     return redirect('/error?message=No access')
   }
@@ -62,7 +67,7 @@ export default defineRoute<State>((_req, ctx) => {
       <Images
         images={images}
         albumId={album.id}
-        options={getAlbumOptions(userId)}
+        options={getAlbumOptions(db, userId)}
       />
       <Pagination
         currentPage={page}

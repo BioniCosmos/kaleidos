@@ -2,8 +2,9 @@ import type { Handlers } from '$fresh/server.ts'
 import { ensureFile, exists, existsSync } from '$std/fs/mod.ts'
 import { basename, dirname, extname, join } from '$std/path/mod.ts'
 import sharp from 'sharp'
+import type { DB } from 'sqlite'
 import config from '../../config.ts'
-import { db, type Album, type Image } from '../../db.ts'
+import { type Album, type Image } from '../../db.ts'
 import {
   fileNameWithSuffix,
   getPath,
@@ -17,10 +18,13 @@ export const handler: Handlers<unknown, State> = {
   async POST(req, ctx) {
     const formData = await req.formData()
     const imageFiles = formData.getAll('imageFile') as File[]
-    const { id: userId } = ctx.state.user
+
+    const { db, user } = ctx.state
+    const { id: userId } = user
+
     const albumId = Number(formData.get('albumId') as string)
     const jobs = imageFiles.map((imageFile) =>
-      saveImage(imageFile, userId, albumId)
+      saveImage(db, imageFile, userId, albumId)
     )
     await Promise.all(jobs)
     return redirect(`/album/${albumId}`)
@@ -30,11 +34,14 @@ export const handler: Handlers<unknown, State> = {
     const { id, selectedIds }: { id: number; selectedIds?: number[] } =
       await req.json()
     const ids = selectedIds ?? [id]
-    const jobs = ids.map((id) => deleteImage(id))
+    const jobs = ids.map((id) => deleteImage(db, id))
+
+    const { db, user } = ctx.state
+    const { id: userId, isAdmin } = user
+
     const userIds = db.queryEntries<Pick<Image, 'userId'>>(
       `SELECT userId FROM images WHERE id IN (${ids.join(', ')})`
     )
-    const { id: userId, isAdmin } = ctx.state.user
     if (
       userIds.some(({ userId: imageUserId }) => imageUserId !== userId) &&
       !isAdmin
@@ -51,10 +58,12 @@ export const handler: Handlers<unknown, State> = {
       await req.json()
     const joinedIds = ids.join(', ')
 
+    const { db, user } = ctx.state
+    const { id: userId, isAdmin } = user
+
     const userIds = db.queryEntries<Pick<Image, 'userId'>>(
       `SELECT userId FROM images WHERE id IN (${joinedIds})`
     )
-    const { id: userId, isAdmin } = ctx.state.user
     if (
       userIds.some(({ userId: imageUserId }) => imageUserId !== userId) &&
       !isAdmin
@@ -78,7 +87,12 @@ export const handler: Handlers<unknown, State> = {
   },
 }
 
-async function saveImage(imageFile: File, userId: string, albumId: number) {
+async function saveImage(
+  db: DB,
+  imageFile: File,
+  userId: string,
+  albumId: number
+) {
   const { base: name, ext } = parseFileName(imageFile.name)
   const time = getTime()
   const date = time.time
@@ -118,7 +132,7 @@ async function saveImage(imageFile: File, userId: string, albumId: number) {
   )
 }
 
-export function deleteImage(id: number) {
+export function deleteImage(db: DB, id: number) {
   return db.transaction(() => {
     const { albumId, path } = db.queryEntries<Pick<Image, 'albumId' | 'path'>>(
       'DELETE FROM images WHERE id = :id RETURNING albumId, path',

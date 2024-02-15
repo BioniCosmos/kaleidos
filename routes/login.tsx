@@ -4,15 +4,17 @@ import Button from '../components/Button.tsx'
 import Form from '../components/Form.tsx'
 import Input from '../components/Input.tsx'
 import Title from '../components/Title.tsx'
-import { db, type User } from '../db.ts'
+import { type User } from '../db.ts'
 import { jwtSign, redirect } from '../utils.ts'
+import type { State } from './_middleware.ts'
 
-export const handler: Handlers = {
-  async POST(req) {
+export const handler: Handlers<unknown, State> = {
+  async POST(req, ctx) {
     const loginInfo = await req.formData()
     const id = loginInfo.get('id') as string
     const password = loginInfo.get('password') as string
 
+    const { db } = ctx.state
     const user = db
       .queryEntries<User>('SELECT * FROM users WHERE id = :id', { id })
       .at(0)
