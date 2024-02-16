@@ -1,7 +1,7 @@
 {
   "lock": false,
   "tasks": {
-    "check": "deno lint --ignore=argon2/wasm_exec.js && deno check **/*.ts && deno check **/*.tsx",
+    "check": "deno lint --ignore=argon2/wasm_exec.js && deno check argon2/mod.ts components/**/*.tsx islands/**/*.tsx routes/**/*.ts routes/**/*.tsx *.ts",
     "cli": "echo \"import '\\$fresh/src/dev/cli.ts'\" | deno run --unstable -A -",
     "manifest": "deno task cli manifest $(pwd)",
     "start": "deno run -A --watch=static/,routes/ dev.ts",

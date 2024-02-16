@@ -17,6 +17,9 @@ export default function Layout({
         </a>
         {user !== undefined && (
           <div class="flex items-center gap-6">
+            <a href="/logout">
+              <Icon name="log-out" />
+            </a>
             <a href="/settings">
               <Icon name="settings" />
             </a>

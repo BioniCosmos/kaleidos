@@ -32,18 +32,18 @@ export async function handler(req: Request, ctx: FreshContext<State>) {
     return redirect('/')
   }
 
-  ctx.state = new State(isValid, userId)
-  if (ctx.route.startsWith('/settings')) {
+  ctx.state = new State(userId)
+  if (ctx.route.startsWith('/settings') || ctx.route === '/login') {
     ctx.state.refreshUser(userId)
   }
   return ctx.next()
 }
 
 export class State {
-  static #user: User
+  static #user: User | undefined
   static #db: DB
 
-  constructor(isValid: boolean, userId: string | null) {
+  constructor(userId: string | null) {
     if (State.#db === undefined) {
       State.#db = new DB(join(config.workingDir, 'kaleidos.db'))
       State.#db.execute('PRAGMA foreign_keys = ON')
@@ -52,13 +52,13 @@ export class State {
       createImageTable(State.#db)
     }
 
-    if (isValid && State.#user === undefined) {
+    if (userId !== null && State.#user === undefined) {
       this.refreshUser(userId)
     }
   }
 
   get user() {
-    return State.#user
+    return State.#user!
   }
 
   get db() {
@@ -66,10 +66,14 @@ export class State {
   }
 
   refreshUser(userId: string | null) {
-    const [user] = State.#db.queryEntries<User>(
-      'SELECT * FROM users WHERE id = ?',
-      [userId]
-    )
-    State.#user = user
+    if (userId !== null) {
+      const [user] = State.#db.queryEntries<User>(
+        'SELECT * FROM users WHERE id = ?',
+        [userId]
+      )
+      State.#user = user
+    } else {
+      State.#user = undefined
+    }
   }
 }
