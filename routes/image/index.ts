@@ -31,13 +31,13 @@ export const handler: Handlers<unknown, State> = {
   },
 
   async DELETE(req, ctx) {
+    const { db, user } = ctx.state
+    const { id: userId, isAdmin } = user
+
     const { id, selectedIds }: { id: number; selectedIds?: number[] } =
       await req.json()
     const ids = selectedIds ?? [id]
     const jobs = ids.map((id) => deleteImage(db, id))
-
-    const { db, user } = ctx.state
-    const { id: userId, isAdmin } = user
 
     const userIds = db.queryEntries<Pick<Image, 'userId'>>(
       `SELECT userId FROM images WHERE id IN (${ids.join(', ')})`
