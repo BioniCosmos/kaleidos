@@ -34,7 +34,7 @@ export default function Layout({
         class={
           route !== '/login'
             ? 'p-4 pt-6'
-            : 'h-[calc(100vh_-_2.75rem)] flex items-center justify-center'
+            : 'h-[calc(100dvh_-_2.75rem)] flex items-center justify-center'
         }
       >
         <Component />

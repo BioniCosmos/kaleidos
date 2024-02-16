@@ -64,7 +64,7 @@ export default function UploadImage({ albumId }: { albumId: number }) {
       >
         <div class="flex flex-wrap justify-center gap-4">
           {images.map((image) => (
-            <img src={image} class="w-28 h-28 object-cover rounded" />
+            <img src={image} class="size-28 object-cover rounded" />
           ))}
         </div>
       </Dialog>

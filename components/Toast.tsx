@@ -13,7 +13,7 @@ export default function Toast({ toastIds }: { toastIds: string[] }) {
           role="alert"
         >
           {/* dark:bg-green-800 dark:text-green-200 */}
-          <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 text-green-500 bg-green-100 rounded-lg">
+          <div class="inline-flex items-center justify-center flex-shrink-0 size-8 text-green-500 bg-green-100 rounded-lg">
             <Icon name="check" />
           </div>
           <div class="ms-3 text-sm font-normal">Copied!</div>
