@@ -4,6 +4,7 @@ import {
   jwtVerify as verify,
 } from 'https://deno.land/x/jose@v5.2.0/index.ts'
 import ShortUniqueId from 'https://esm.sh/short-unique-id@5.0.3'
+import { useRef } from 'preact/hooks'
 import type { User } from './db.ts'
 
 export function redirect(path: string) {
@@ -112,4 +113,12 @@ export function sendJSON(
 
 export function setToArray<T>(set: Set<T>) {
   return Array.from(set.values())
+}
+
+// References:
+// https://github.com/Tinkerforge/esp32-firmware/blob/d5f5c2e760dacaff7804304e7655982be779498d/software/web/src/ts/util.ts#L599
+// https://jser.dev/2023-04-25-how-does-useid-work/
+let _id = 0
+export function useId() {
+  return useRef(`KRI-${_id++}`).current
 }
