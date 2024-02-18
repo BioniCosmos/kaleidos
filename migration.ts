@@ -11,7 +11,7 @@ const client = await new Client().connect({
   password: '123456',
   db: 'chevereto',
 })
-const { db } = new State(null)
+const { db } = new State(null, false)
 
 console.log('Databases connected')
 

@@ -32,7 +32,7 @@ export async function handler(req: Request, ctx: FreshContext<State>) {
     return redirect('/')
   }
 
-  ctx.state = new State(userId)
+  ctx.state = new State(userId, true)
   if (ctx.route.startsWith('/settings') || ctx.route === '/login') {
     ctx.state.refreshUser(userId)
   }
@@ -43,13 +43,21 @@ export class State {
   static #user: User | undefined
   static #db: DB
 
-  constructor(userId: string | null) {
+  constructor(userId: string | null, userInit: boolean) {
     if (State.#db === undefined) {
       State.#db = new DB(join(config.workingDir, 'kaleidos.db'))
       State.#db.execute('PRAGMA foreign_keys = ON')
       createUserTable(State.#db)
       createAlbumTable(State.#db)
       createImageTable(State.#db)
+
+      if (userInit) {
+        const defaultPassword = hash('123456')
+        State.#db.query(
+          `INSERT OR IGNORE INTO users VALUES('admin', ?, '', TRUE)`,
+          [defaultPassword]
+        )
+      }
     }
 
     if (userId !== null && State.#user === undefined) {
