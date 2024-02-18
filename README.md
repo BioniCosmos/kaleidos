@@ -5,14 +5,7 @@
 
 [![Made with Fresh](https://fresh.deno.dev/fresh-badge-dark.svg)](https://fresh.deno.dev)
 
-> [!NOTE]
-> We are actively testing the project!
-
 ## Todo
 
 - [ ] Dark theme
 - [ ] i18n
-- [x] Config files or environment variables
-- [x] Permission control
-- [x] Direct/shared links
-- [x] Dynamic page titles
