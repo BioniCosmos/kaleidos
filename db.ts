@@ -60,11 +60,11 @@ export function createUserTable(db: DB) {
   `)
 }
 
-export function getAlbumOptions(db: DB, userId: string) {
-  return db
-    .queryEntries<Pick<Album, 'id' | 'name'>>(
-      'SELECT id, name FROM albums WHERE userId = :userId',
-      { userId }
-    )
-    .map(({ id, name }) => ({ value: id, name }))
+export function getAlbumOptions(db: DB, userId: string, isAdmin: boolean) {
+  // prettier-ignore
+  const query = (db.queryEntries<Pick<Album, 'id' | 'name'>>).bind(db)
+  const albums = isAdmin
+    ? query('SELECT id, name FROM albums')
+    : query('SELECT id, name FROM albums WHERE userId = :userId', { userId })
+  return albums.map(({ id, name }) => ({ value: id, name }))
 }

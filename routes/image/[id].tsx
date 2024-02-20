@@ -3,7 +3,7 @@ import { join } from '$std/path/mod.ts'
 import type { FeatherIconNames } from 'feather-icons'
 import Icon from '../../components/Icon.tsx'
 import Title from '../../components/Title.tsx'
-import { getAlbumOptions, type Album, type Image } from '../../db.ts'
+import { getAlbumOptions, type Album, type Image, type User } from '../../db.ts'
 import ImageInfo from '../../islands/ImageInfo.tsx'
 import ImageLink from '../../islands/ImageLink.tsx'
 import { redirect } from '../../utils.ts'
@@ -45,7 +45,7 @@ export const handler: Handlers<unknown, State> = {
 
 export default defineRoute<State>((_req, ctx) => {
   const { db, user } = ctx.state
-  const { name: userName, id: userId, isAdmin } = user
+  const { id: userId, isAdmin } = user
 
   const image = db
     .queryEntries<Image>('SELECT * FROM images WHERE id = :id', ctx.params)
@@ -62,6 +62,11 @@ export default defineRoute<State>((_req, ctx) => {
     'SELECT name FROM albums WHERE id = ?',
     [image.albumId]
   )[0].name
+
+  const [{ name: userName }] = db.queryEntries<Pick<User, 'name'>>(
+    'SELECT name FROM users WHERE id = ?',
+    [image.userId]
+  )
 
   const info = (
     [
@@ -80,7 +85,10 @@ export default defineRoute<State>((_req, ctx) => {
       <Title>{image.name}</Title>
       <div class="mb-6 flex items-center flex-col gap-4">
         <h2 class="text-2xl font-bold">{image.name}</h2>
-        <ImageInfo image={image} options={getAlbumOptions(db, userId)} />
+        <ImageInfo
+          image={image}
+          options={getAlbumOptions(db, userId, isAdmin)}
+        />
       </div>
       <a href={rawPath}>
         <img src={rawPath} class="max-h-[75vh] mx-auto" />

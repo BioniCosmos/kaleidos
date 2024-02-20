@@ -67,7 +67,7 @@ export default defineRoute<State>((_req, ctx) => {
       <Images
         images={images}
         albumId={album.id}
-        options={getAlbumOptions(db, userId)}
+        options={getAlbumOptions(db, userId, isAdmin)}
       />
       <Pagination
         currentPage={page}
