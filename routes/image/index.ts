@@ -1,17 +1,10 @@
 import type { Handlers } from '$fresh/server.ts'
-import { ensureFile, exists, existsSync } from '$std/fs/mod.ts'
-import { basename, dirname, extname, join } from '$std/path/mod.ts'
-import sharp from 'sharp'
+import { existsSync } from '$std/fs/mod.ts'
+import { basename, join } from '$std/path/mod.ts'
 import type { DB } from 'sqlite'
-import config from '../../config.ts'
+import { ImagePath, formats, processImage } from '../../ImagePath.ts'
 import { type Album, type Image } from '../../db.ts'
-import {
-  fileNameWithSuffix,
-  getPath,
-  getTime,
-  parseFileName,
-  redirect,
-} from '../../utils.ts'
+import { getTime, redirect } from '../../utils.ts'
 import type { State } from '../_middleware.ts'
 
 export const handler: Handlers<unknown, State> = {
@@ -93,27 +86,24 @@ async function saveImage(
   userId: string,
   albumId: number
 ) {
-  const { base: name, ext } = parseFileName(imageFile.name)
   const time = getTime()
+  const imagePath = await ImagePath.from(imageFile, time)
+
+  const name = imagePath.name
+  const ext = imagePath.ext
   const date = time.time
-  const needSuffix = await exists(
-    join(config.workingDir, 'images/raw/', getPath(imageFile.name, time))
-  )
-  const path = getPath(
-    needSuffix ? fileNameWithSuffix(imageFile.name) : imageFile.name,
-    time
-  )
+  const path = imagePath.toString()
   const size = imageFile.size
 
-  const actualPath = join(config.workingDir, 'images/raw/', path)
-  await ensureFile(actualPath)
-  const image = sharp(await imageFile.arrayBuffer())
-  const { orientation } = await image.metadata()
-  await image
-    .keepIccProfile()
-    .withExif({})
-    .withMetadata({ orientation })
-    .toFile(actualPath)
+  const image = await processImage(await imageFile.arrayBuffer())
+  const jobs = [
+    image(imagePath.raw),
+    image(imagePath.thumbnail(), { isThumbnail: true }),
+    ...formats.map((format) =>
+      image(imagePath.thumbnail(format), { format, isThumbnail: true })
+    ),
+  ]
+  await Promise.all(jobs)
 
   db.queryEntries(
     `
@@ -139,15 +129,18 @@ export function deleteImage(db: DB, id: number) {
       { id }
     )[0]
 
-    const rawPath = join(config.workingDir, 'images/raw/', path)
-    Deno.removeSync(rawPath)
+    const imagePath = new ImagePath(path)
+    Deno.removeSync(imagePath.raw)
 
-    const tmpPath = join(config.workingDir, 'images/tmp/', path)
-    const tmpDir = dirname(tmpPath)
+    const tmpDir = imagePath.tmpDir
     if (existsSync(tmpDir)) {
-      Array.from(Deno.readDirSync(dirname(tmpPath)))
-        .filter(({ name }) => name.startsWith(basename(path)))
-        .forEach(({ name }) => Deno.removeSync(tmpPath + extname(name)))
+      Array.from(Deno.readDirSync(tmpDir))
+        .filter(
+          ({ name }) =>
+            name.startsWith(imagePath.base) ||
+            name.startsWith(basename(imagePath.thumbnail()))
+        )
+        .forEach(({ name }) => Deno.removeSync(join(tmpDir, name)))
     }
 
     return albumId

@@ -61,11 +61,21 @@ export default function Images({
       <Grid>
         {images.map(({ id, path }) => (
           <a href={`/image/${id}`} class="relative group">
-            <img
-              src={join('/images', path)}
-              loading="lazy"
-              class="w-full h-48 object-cover hover:scale-105 transition rounded shadow hover:shadow-lg"
-            />
+            <picture>
+              <source
+                srcset={join('/images', `${path}?thumbnail=true&format=avif`)}
+                type="image/avif"
+              />
+              <source
+                srcset={join('/images', `${path}?thumbnail=true&format=webp`)}
+                type="image/webp"
+              />
+              <img
+                src={join('/images', `${path}?thumbnail=true`)}
+                loading="lazy"
+                class="w-full h-48 object-cover hover:scale-105 transition rounded shadow hover:shadow-lg"
+              />
+            </picture>
             <Checkbox
               id={id}
               selectedIds={selectedIds}

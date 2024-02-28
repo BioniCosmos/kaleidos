@@ -1,4 +1,3 @@
-import { join, parse } from '$std/path/mod.ts'
 import {
   SignJWT,
   jwtVerify as verify,
@@ -67,11 +66,6 @@ export function verifyToken(cookie: string | null) {
   return jwtVerify(token)
 }
 
-export function parseFileName(fileName: string) {
-  const { name, ext } = parse(fileName)
-  return { base: name, ext: ext.slice(1) }
-}
-
 export interface Timestamp {
   year: string
   month: string
@@ -85,15 +79,6 @@ export function getTime(date = new Date()): Timestamp {
   const day = date.getDate().toString().padStart(2, '0')
   const time = date.getTime()
   return { year, month, day, time }
-}
-
-export function getPath(fileName: string, { year, month, day } = getTime()) {
-  return join(year, month, day, fileName)
-}
-
-export function fileNameWithSuffix(fileName: string) {
-  const { base, ext } = parseFileName(fileName)
-  return `${base}-${randomId()}.${ext}`
 }
 
 export const randomId = new ShortUniqueId().randomUUID

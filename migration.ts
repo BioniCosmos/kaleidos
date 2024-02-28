@@ -1,9 +1,10 @@
 import { walk } from '$std/fs/mod.ts'
 import { hash } from 'argon2'
 import { Client } from 'https://deno.land/x/mysql@v2.12.1/mod.ts'
+import { ImagePath } from './ImagePath.ts'
 import { type Album, type Image, type User } from './db.ts'
 import { State } from './routes/_middleware.ts'
-import { getPath, getTime } from './utils.ts'
+import { getTime } from './utils.ts'
 
 console.log('Starting the migration…')
 
@@ -81,7 +82,7 @@ const images: Image[] = await Promise.all(
       const time = getTime(image_date)
       const date = time.time
       const userId = await findUserNameById(image_user_id)
-      const path = getPath(`${name}.${ext}`, time)
+      const path = (await ImagePath.from(`${name}.${ext}`, time)).toString()
       return {
         id,
         name,

@@ -1,10 +1,7 @@
 import { type Handlers, type RouteConfig } from '$fresh/server.ts'
-import { ensureFile, exists } from '$std/fs/mod.ts'
+import { exists } from '$std/fs/mod.ts'
 import { contentType } from '$std/media_types/mod.ts'
-import { join } from '$std/path/mod.ts'
-import sharp from 'sharp'
-import conf from '../config.ts'
-import { parseFileName } from '../utils.ts'
+import { ImagePath, formats, processImage, type Format } from '../ImagePath.ts'
 
 export const config: RouteConfig = {
   routeOverride: '/images/:year/:month/:day/:name',
@@ -13,17 +10,20 @@ export const config: RouteConfig = {
 export const handler: Handlers = {
   async GET(req, ctx) {
     const path = decodeURIComponent(Object.values(ctx.params).join('/'))
-    const format = ctx.url.searchParams.get('format')
-    const { ext } = parseFileName(path)
+    const imagePath = new ImagePath(path)
+    const format = ctx.url.searchParams.get('format') as Format | null
+    const isThumbnail = ctx.url.searchParams.get('thumbnail') === 'true'
+
     const needConvert =
-      format !== null &&
-      format !== ext &&
-      (format === 'webp' || format === 'avif')
-    const rawPath = join(conf.workingDir, 'images/raw/', path)
-    const actualPath = needConvert
-      ? join(conf.workingDir, 'images/tmp/', `${path}.${format}`)
-      : rawPath
-    const type = contentType(needConvert ? format : ext)
+      format !== null && format !== imagePath.ext && formats.includes(format)
+    const actualPath = isThumbnail
+      ? needConvert
+        ? imagePath.thumbnail(format)
+        : imagePath.thumbnail()
+      : needConvert
+      ? imagePath.converted(format)
+      : imagePath.raw
+    const type = contentType(needConvert ? format : imagePath.ext)
     if (type === undefined) {
       return new Response(null, {
         status: 400,
@@ -43,15 +43,9 @@ export const handler: Handlers = {
     }
 
     if (needConvert && !(await exists(actualPath))) {
-      await ensureFile(actualPath)
-      const image = sharp(rawPath)
-      const { orientation } = await image.metadata()
-      await image
-        .keepIccProfile()
-        .withExif({})
-        .withMetadata({ orientation })
-        .toFormat(format)
-        .toFile(actualPath)
+      await (
+        await processImage(imagePath.raw)
+      )(actualPath, { format, isThumbnail })
     }
 
     try {
