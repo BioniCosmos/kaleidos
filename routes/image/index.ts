@@ -89,7 +89,7 @@ async function saveImage(
   const time = getTime()
   const imagePath = await ImagePath.from(imageFile, time)
 
-  const name = imagePath.name
+  const name = imagePath.originalName
   const ext = imagePath.ext
   const date = time.time
   const path = imagePath.toString()

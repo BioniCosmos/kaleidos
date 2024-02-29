@@ -11,10 +11,12 @@ export type Format = (typeof formats)[number]
 export class ImagePath {
   #path: string
   #parsedPath: ParsedPath
+  #originalName: string | undefined
 
-  constructor(path: string) {
+  constructor(path: string, originalName?: string) {
     this.#path = path
     this.#parsedPath = parse(path)
+    this.#originalName = originalName
   }
 
   private withSuffix(suffix: string = randomId()) {
@@ -31,9 +33,12 @@ export class ImagePath {
     const name = typeof fileOrName === 'string' ? fileOrName : fileOrName.name
     const { year, month, day } = timestamp
     const path = join(year, month, day, name)
+
     const imagePath = new ImagePath(path)
     const needSuffix = await exists(imagePath.raw)
-    return !needSuffix ? imagePath : new ImagePath(imagePath.withSuffix())
+    return !needSuffix
+      ? imagePath
+      : new ImagePath(imagePath.withSuffix(), imagePath.name)
   }
 
   get name() {
@@ -58,6 +63,10 @@ export class ImagePath {
 
   get tmpDir() {
     return join(config.workingDir, '/images/tmp', this.dir)
+  }
+
+  get originalName() {
+    return this.#originalName ?? this.name
   }
 
   thumbnail(format?: Format) {
