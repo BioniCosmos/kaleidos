@@ -25,7 +25,7 @@ export default function AlbumInfo({
 
   return (
     <>
-      <div class="flex bg-gray-200 rounded-lg shadow-lg">
+      <div class="flex bg-gray-200 dark:bg-zinc-500 rounded-lg shadow-lg">
         <div class="rounded-lg py-2 px-6 transition pointer-events-none">
           {count} image{count > 1 && 's'}
         </div>

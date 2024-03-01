@@ -40,7 +40,7 @@ export default function Login() {
   return (
     <>
       <Title>Login</Title>
-      <Form method="post" class="bg-white p-8 rounded shadow">
+      <Form method="post" class="bg-white p-8 rounded shadow dark:bg-zinc-950 dark:border-zinc-800 dark:border">
         <Input label="Id" name="id" required />
         <Input label="Password" type="password" name="password" required />
         <Button>Login</Button>

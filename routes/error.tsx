@@ -5,7 +5,9 @@ export default function Error({ url }: PageProps) {
   return (
     <>
       <Title>Error</Title>
-      Error: {url.searchParams.get('message')}
+      <div class="dark:text-zinc-50">
+        Error: {url.searchParams.get('message')}
+      </div>
     </>
   )
 }

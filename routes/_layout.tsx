@@ -11,8 +11,8 @@ export default function Layout({
   const { user } = state
   return (
     <>
-      <header class="bg-gray-300 px-4 py-2 flex items-center justify-between">
-        <a href="/" class="text-xl font-bold">
+      <header class="bg-gray-300 dark:bg-zinc-950 px-4 py-2 flex items-center justify-between dark:border-zinc-800 dark:border-b dark:text-zinc-50 dark:text-opacity-60">
+        <a href="/" class="text-xl font-bold dark:text-zinc-50">
           {config.title}
         </a>
         {user !== undefined && (
@@ -24,7 +24,7 @@ export default function Layout({
               <Icon name="settings" />
             </a>
             <div class="text-right">
-              <h2 class="text-xl font-bold">{user.name}</h2>
+              <h2 class="text-xl font-bold dark:text-zinc-50">{user.name}</h2>
               <h3 class="text-gray-500">{user.id}</h3>
             </div>
           </div>

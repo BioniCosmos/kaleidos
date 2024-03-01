@@ -38,7 +38,7 @@ export default function Albums({ albums }: { albums: Album[] }) {
         {albums.map(({ id, name }) => (
           <a
             href={`/album/${id}`}
-            class="relative group rounded shadow bg-gray-100 hover:bg-gray-200 p-4 text-xl hover:scale-105 hover:shadow-lg transition"
+            class="relative group rounded-lg shadow bg-gray-100 hover:bg-gray-200 p-4 text-xl hover:scale-105 hover:shadow-lg transition dark:bg-zinc-800 dark:hover:bg-opacity-80 dark:hover:bg-zinc-800 dark:text-zinc-50 dark:text-opacity-60"
           >
             <Checkbox
               id={id}

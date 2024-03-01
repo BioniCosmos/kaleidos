@@ -24,14 +24,19 @@ export default function TextArea({
 
   return (
     <div>
-      <label for={id} class="text-gray-700" onClick={handleClick}>
+      <label
+        for={id}
+        class="text-gray-700 dark:text-zinc-50 dark:text-opacity-60"
+        onClick={handleClick}
+      >
         {label}
       </label>
       <textarea
         id={id}
         class={clsx(
           'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50',
-          className
+          className,
+          'dark:bg-transparent dark:text-zinc-50 dark:focus:ring-0 dark:focus:border-gray-300 dark:border-opacity-40 dark:focus:border-opacity-100'
         )}
         {...props}
         ref={textAreaRef}

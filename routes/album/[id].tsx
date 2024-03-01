@@ -61,7 +61,7 @@ export default defineRoute<State>((_req, ctx) => {
     <>
       <Title>{album.name}</Title>
       <div class="mb-6 flex items-center flex-col gap-4">
-        <h2 class="text-2xl font-bold">{album.name}</h2>
+        <h2 class="text-2xl font-bold dark:text-zinc-50">{album.name}</h2>
         <AlbumInfo album={album} count={count} />
       </div>
       <Images

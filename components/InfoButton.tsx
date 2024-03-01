@@ -13,7 +13,7 @@ export default function InfoButton({
 }) {
   return (
     <button
-      class="flex gap-1 items-center hover:bg-gray-300 rounded-lg py-2 px-6 transition"
+      class="flex gap-1 items-center hover:bg-gray-300 dark:hover:bg-zinc-400 rounded-lg py-2 px-6 transition"
       onClick={onClick}
     >
       <Icon name={iconName} options={{ width: 18, height: 18 }} />

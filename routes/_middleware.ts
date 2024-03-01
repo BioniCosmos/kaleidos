@@ -19,12 +19,14 @@ export async function handler(req: Request, ctx: FreshContext<State>) {
   const userId = await verifyToken(req.headers.get('Cookie'))
   const isValid = userId !== null
 
-  // | `isToLogin` | `isValid` | Behaviour   |
-  // | ----------- | --------- | ----------- |
-  // | 0           | 0         | to `/login` |
-  // | 0           | 1         | -           |
-  // | 1           | 0         | -           |
-  // | 1           | 1         | to `/`      |
+  /**
+   * | `isToLogin` | `isValid` | Behaviour   |
+   * | ----------- | --------- | ----------- |
+   * | 0           | 0         | to `/login` |
+   * | 0           | 1         | -           |
+   * | 1           | 0         | -           |
+   * | 1           | 1         | to `/`      |
+   */
   if (!isToLogin && !isValid) {
     return redirect('/login')
   }

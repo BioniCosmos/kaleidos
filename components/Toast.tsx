@@ -8,12 +8,10 @@ export default function Toast({ toastIds }: { toastIds: string[] }) {
       {toastIds.map((id) => (
         <div
           key={id}
-          // dark:text-gray-400 dark:bg-gray-800
-          class="animate-pop flex items-center p-4 text-gray-500 bg-white rounded-lg shadow"
+          class="animate-pop flex items-center p-4 text-gray-500 bg-white rounded-lg shadow dark:text-gray-400 dark:bg-gray-800"
           role="alert"
         >
-          {/* dark:bg-green-800 dark:text-green-200 */}
-          <div class="inline-flex items-center justify-center flex-shrink-0 size-8 text-green-500 bg-green-100 rounded-lg">
+          <div class="inline-flex items-center justify-center flex-shrink-0 size-8 text-green-500 bg-green-100 rounded-lg dark:bg-green-800 dark:text-green-200">
             <Icon name="check" />
           </div>
           <div class="ms-3 text-sm font-normal">Copied!</div>
