@@ -1,6 +1,7 @@
 import { type PageProps } from '$fresh/server.ts'
 import Icon from '../components/Icon.tsx'
 import config from '../config.ts'
+import Theme from '../islands/Theme.tsx'
 import type { State } from './_middleware.ts'
 
 export default function Layout({
@@ -17,6 +18,7 @@ export default function Layout({
         </a>
         {user !== undefined && (
           <div class="flex items-center gap-6">
+            <Theme />
             <a href="/logout">
               <Icon name="log-out" />
             </a>

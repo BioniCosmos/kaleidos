@@ -10,6 +10,7 @@ export default function App({ Component }: PageProps) {
         <title>{config.title}</title>
         <link rel="icon" href="/favicon.png" />
         <link rel="stylesheet" href="/styles.css" />
+        <script src="/theme.js"></script>
       </head>
       <body class="bg-gray-50 dark:bg-zinc-950">
         <Component />
