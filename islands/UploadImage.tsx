@@ -24,17 +24,38 @@ export default function UploadImage({ albumId }: { albumId: number }) {
     inputRef.current!.value = ''
   }
 
+  interface Progress {
+    loaded: number
+    total: number
+  }
+  const [progress, setProgress] = useState<Progress | null>(null)
+  const getProgress = ({ loaded, total }: Progress, round = false) => {
+    const percent = (loaded / total) * 100
+    return `${round ? Math.round(percent) : percent}%`
+  }
+
   function submit() {
-    formRef.current?.submit()
+    return new Promise<void>(() => {
+      const formData = new FormData(formRef.current!)
+      const xhr = new XMLHttpRequest()
+
+      xhr.upload.addEventListener('progress', ({ loaded, total }) =>
+        setProgress({ loaded, total })
+      )
+
+      xhr.addEventListener('loadend', () => {
+        if (xhr.status === 200) {
+          location.assign(xhr.responseURL)
+        }
+      })
+
+      xhr.open('POST', '/image')
+      xhr.send(formData)
+    })
   }
 
   return (
-    <form
-      method="post"
-      action="/image"
-      enctype="multipart/form-data"
-      ref={formRef}
-    >
+    <form ref={formRef}>
       <label
         role="button"
         class="justify-center py-2 px-4 flex gap-3 items-center bg-blue-500 text-white font-bold rounded-full hover:bg-blue-700 transition"
@@ -67,6 +88,16 @@ export default function UploadImage({ albumId }: { albumId: number }) {
             <img src={image} class="size-28 object-cover rounded" />
           ))}
         </div>
+        {progress !== null && (
+          <div class="w-full bg-gray-200 rounded-full dark:bg-gray-700">
+            <div
+              class="bg-blue-600 text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-full"
+              style={{ width: getProgress(progress) }}
+            >
+              {getProgress(progress, true)}
+            </div>
+          </div>
+        )}
       </Dialog>
     </form>
   )

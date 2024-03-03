@@ -1,6 +1,14 @@
 import type { JSX } from 'preact'
-import { useEffect, useRef } from 'preact/hooks'
+import { useEffect, useRef, useState } from 'preact/hooks'
 import Button from './Button.tsx'
+
+interface Props extends JSX.HTMLAttributes<HTMLDialogElement> {
+  title?: string
+  close: () => void
+  onConfirm: (
+    event: JSX.TargetedEvent<HTMLDialogElement>
+  ) => void | Promise<void>
+}
 
 export default function Dialog({
   open,
@@ -9,12 +17,10 @@ export default function Dialog({
   title,
   onClose,
   onConfirm,
-}: Omit<JSX.HTMLAttributes<HTMLDialogElement>, 'title'> & {
-  title?: string
-  close: () => void
-  onConfirm?: JSX.GenericEventHandler<HTMLDialogElement>
-}) {
+}: Props) {
   const dialogRef = useRef<HTMLDialogElement>(null)
+  const [isWorking, setIsWorking] = useState(false)
+
   useEffect(() => {
     if (open) {
       dialogRef.current?.showModal()
@@ -23,12 +29,14 @@ export default function Dialog({
     }
   })
 
-  function handleClose(event: JSX.TargetedEvent<HTMLDialogElement>) {
+  async function handleClose(event: JSX.TargetedEvent<HTMLDialogElement>) {
+    setIsWorking(true)
     if (event.currentTarget.returnValue === 'confirm') {
-      onConfirm?.(event)
+      await onConfirm?.(event)
     }
     onClose?.(event)
     close()
+    setIsWorking(false)
   }
 
   return (
@@ -41,10 +49,12 @@ export default function Dialog({
       <div class="space-y-6 dark:text-zinc-50 dark:text-opacity-60">
         {children}
         <form method="dialog" class="flex justify-center gap-2">
-          <Button color="red" value="close">
+          <Button color="red" value="close" disabled={isWorking}>
             Cancel
           </Button>
-          <Button value="confirm">Confirm</Button>
+          <Button value="confirm" disabled={isWorking}>
+            Confirm
+          </Button>
         </form>
       </div>
     </dialog>
