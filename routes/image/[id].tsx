@@ -84,7 +84,7 @@ export default defineRoute<State>((_req, ctx) => {
     <>
       <Title>{image.name}</Title>
       <div class="mb-6 flex items-center flex-col gap-4">
-        <h2 class="text-2xl font-bold text-zinc-50">{image.name}</h2>
+        <h2 class="text-2xl font-bold dark:text-zinc-50">{image.name}</h2>
         <ImageInfo
           image={image}
           options={getAlbumOptions(db, userId, isAdmin)}

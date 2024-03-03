@@ -32,7 +32,10 @@ export default function Dialog({
   async function handleClose(event: JSX.TargetedEvent<HTMLDialogElement>) {
     setIsWorking(true)
     if (event.currentTarget.returnValue === 'confirm') {
-      await onConfirm?.(event)
+      const toConfirm = onConfirm?.(event)
+      if (toConfirm instanceof Promise) {
+        await toConfirm
+      }
     }
     onClose?.(event)
     close()
