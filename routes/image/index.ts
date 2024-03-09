@@ -20,7 +20,13 @@ export const handler: Handlers<unknown, State> = {
       saveImage(db, imageFile, userId, albumId)
     )
     await Promise.all(jobs)
-    return redirect(`/album/${albumId}`)
+
+    const [[total]] = db.query<[number]>(
+      'SELECT count(*) FROM images WHERE albumId = :albumId',
+      { albumId }
+    )
+    const lastPage = Math.ceil(total / 15)
+    return redirect(`/album/${albumId}?page=${lastPage}`)
   },
 
   async DELETE(req, ctx) {
