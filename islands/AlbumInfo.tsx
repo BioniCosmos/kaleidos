@@ -44,7 +44,7 @@ export default function AlbumInfo({
         open={editIsOpen}
         close={() => setEditIsOpen(false)}
         title="Editing the album"
-        onConfirm={editSubmit}
+        onClickConfirm={editSubmit}
       >
         <Form method="post" action={`/album/${album.id}`} ref={formRef}>
           <Input label="Name" name="name" value={album.name} required />
@@ -54,7 +54,7 @@ export default function AlbumInfo({
         open={deleteIsOpen}
         close={() => setDeleteIsOpen(false)}
         title="Warning!"
-        onConfirm={deleteSubmit}
+        onClickConfirm={deleteSubmit}
       >
         <div>Are you sure to delete the content?</div>
       </Dialog>

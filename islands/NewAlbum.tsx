@@ -23,7 +23,7 @@ export default function NewAlbum() {
         open={open}
         title="New album"
         close={() => setOpen(false)}
-        onConfirm={submit}
+        onClickConfirm={submit}
       >
         <Form method="post" action="/album" ref={formRef}>
           <Input label="Name" name="name" required />

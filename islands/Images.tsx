@@ -108,7 +108,7 @@ export default function Images({
         open={open}
         close={() => setOpen(false)}
         title="Move to album"
-        onConfirm={moveToAlbum}
+        onClickConfirm={moveToAlbum}
       >
         <SelectMenu
           label="Album"

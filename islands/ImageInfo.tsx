@@ -45,7 +45,7 @@ export default function ImageInfo({
         open={editIsOpen}
         close={() => setEditIsOpen(false)}
         title="Editing the image"
-        onConfirm={editSubmit}
+        onClickConfirm={editSubmit}
       >
         <Form method="post" action={`/image/${image.id}`} ref={formRef}>
           <Input label="Name" name="name" value={image.name} required />
@@ -62,7 +62,7 @@ export default function ImageInfo({
         open={deleteIsOpen}
         close={() => setDeleteIsOpen(false)}
         title="Warning!"
-        onConfirm={deleteSubmit}
+        onClickConfirm={deleteSubmit}
       >
         <div>Are you sure to delete the content?</div>
       </Dialog>

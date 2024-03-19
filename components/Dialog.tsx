@@ -5,9 +5,11 @@ import Button from './Button.tsx'
 interface Props extends JSX.HTMLAttributes<HTMLDialogElement> {
   title?: string
   close: () => void
-  onConfirm: (
+  onClickConfirm: (
     event: JSX.TargetedEvent<HTMLDialogElement>
   ) => void | Promise<void>
+  onClickCancel?: () => void
+  cleanup?: JSX.GenericEventHandler<HTMLDialogElement>
 }
 
 export default function Dialog({
@@ -15,8 +17,9 @@ export default function Dialog({
   children,
   close,
   title,
-  onClose,
-  onConfirm,
+  cleanup,
+  onClickConfirm,
+  onClickCancel,
 }: Props) {
   const dialogRef = useRef<HTMLDialogElement>(null)
   const [isWorking, setIsWorking] = useState(false)
@@ -32,12 +35,15 @@ export default function Dialog({
   async function handleClose(event: JSX.TargetedEvent<HTMLDialogElement>) {
     setIsWorking(true)
     if (event.currentTarget.returnValue === 'confirm') {
-      const toConfirm = onConfirm?.(event)
+      const toConfirm = onClickConfirm(event)
       if (toConfirm instanceof Promise) {
         await toConfirm
       }
+    } else {
+      onClickCancel?.()
     }
-    onClose?.(event)
+
+    cleanup?.(event)
     close()
     setIsWorking(false)
   }
@@ -52,7 +58,7 @@ export default function Dialog({
       <div class="space-y-6 dark:text-zinc-50 dark:text-opacity-60">
         {children}
         <form method="dialog" class="flex justify-center gap-2">
-          <Button color="red" value="close" disabled={isWorking}>
+          <Button color="red" value="close">
             Cancel
           </Button>
           <Button value="confirm" disabled={isWorking}>

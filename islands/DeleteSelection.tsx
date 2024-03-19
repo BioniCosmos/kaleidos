@@ -52,7 +52,7 @@ export default function DeleteSelection({
         open={open}
         title="Warning!"
         close={() => setOpen(false)}
-        onConfirm={submit}
+        onClickConfirm={submit}
       >
         <div>Are you sure to delete the content?</div>
       </Dialog>

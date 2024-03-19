@@ -8,6 +8,7 @@ export default function UploadImage({ albumId }: { albumId: number }) {
   const [images, setImages] = useState<string[]>([])
   const inputRef = useRef<HTMLInputElement>(null)
   const formRef = useRef<HTMLFormElement>(null)
+  const xhrRef = useRef<XMLHttpRequest | null>(null)
 
   function preview(event: JSX.TargetedEvent<HTMLInputElement>) {
     const files = event.currentTarget.files
@@ -36,21 +37,21 @@ export default function UploadImage({ albumId }: { albumId: number }) {
 
   function submit() {
     return new Promise<void>(() => {
+      xhrRef.current = new XMLHttpRequest()
       const formData = new FormData(formRef.current!)
-      const xhr = new XMLHttpRequest()
 
-      xhr.upload.addEventListener('progress', ({ loaded, total }) =>
+      xhrRef.current.upload.addEventListener('progress', ({ loaded, total }) =>
         setProgress({ loaded, total })
       )
 
-      xhr.addEventListener('loadend', () => {
-        if (xhr.status === 200) {
-          location.assign(xhr.responseURL)
+      xhrRef.current.addEventListener('loadend', () => {
+        if (xhrRef.current?.status === 200) {
+          location.assign(xhrRef.current.responseURL)
         }
       })
 
-      xhr.open('POST', '/image')
-      xhr.send(formData)
+      xhrRef.current.open('POST', '/image')
+      xhrRef.current.send(formData)
     })
   }
 
@@ -80,8 +81,9 @@ export default function UploadImage({ albumId }: { albumId: number }) {
       <Dialog
         open={open}
         close={() => setOpen(false)}
-        onClose={clean}
-        onConfirm={submit}
+        cleanup={clean}
+        onClickConfirm={submit}
+        onClickCancel={() => xhrRef.current?.abort()}
       >
         <div class="flex flex-wrap justify-center gap-4">
           {images.map((image) => (
