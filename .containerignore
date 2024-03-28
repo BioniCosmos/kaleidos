@@ -1,0 +1,28 @@
+# dotenv environment variable files
+.env
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
+
+# Fresh build directory
+_fresh/
+# npm dependencies
+node_modules/
+
+**/.DS_Store
+*.db
+*.db-journal
+**/images
+
+**/.vscode
+**/go.mod
+**/go.sum
+**/main.go
+Containerfile
+LICENSE
+migration.ts
+README.md
+.gitignore
+.containerignore
+.git
