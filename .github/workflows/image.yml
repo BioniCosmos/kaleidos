@@ -1,7 +1,7 @@
 name: Build and push image
 on:
   release:
-    type: [published]
+    types: [published]
   workflow_dispatch:
 permissions:
   packages: write
