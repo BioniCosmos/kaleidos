@@ -1,0 +1,42 @@
+name: Build and push image
+on:
+  release:
+    type: [published]
+  workflow_dispatch:
+permissions:
+  packages: write
+
+jobs:
+  image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - run: |
+          tag=$(echo ${{ github.ref_name }} | cut -c 2-)
+          echo TAGS="$tag latest" >> $GITHUB_ENV
+
+      - name: Install QEMU
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y qemu-user-static
+
+      - name: Build
+        id: build
+        uses: redhat-actions/buildah-build@v2
+        with:
+          archs: amd64, arm64
+          build-args: GIT_REVISION=${{ github.sha }}
+          containerfiles: Containerfile
+          image: kaleidos
+          tags: ${{ env.TAGS }}
+          oci: true
+
+      - name: Push
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build.outputs.image }}
+          tags: ${{ steps.build.outputs.tags }}
+          registry: ghcr.io/bionicosmos
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
