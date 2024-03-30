@@ -9,7 +9,8 @@ export default function NewAlbum() {
   const formRef = useRef<HTMLFormElement>(null)
 
   function submit() {
-    formRef.current?.submit()
+    const form = formRef.current
+    return form?.reportValidity() ? form.submit() : false
   }
 
   return (

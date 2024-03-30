@@ -19,7 +19,8 @@ export default function ImageInfo({
   const formRef = useRef<HTMLFormElement>(null)
 
   function editSubmit() {
-    formRef.current?.submit()
+    const form = formRef.current
+    return form?.reportValidity() ? form.submit() : false
   }
 
   const deleteSubmit = sendJSON('image', 'DELETE', { id: image.id })

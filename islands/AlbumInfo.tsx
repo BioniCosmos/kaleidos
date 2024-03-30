@@ -18,7 +18,8 @@ export default function AlbumInfo({
   const formRef = useRef<HTMLFormElement>(null)
 
   function editSubmit() {
-    formRef.current?.submit()
+    const form = formRef.current
+    return form?.reportValidity() ? form.submit() : false
   }
 
   const deleteSubmit = sendJSON('album', 'DELETE', { id: album.id })

@@ -2,14 +2,18 @@ import type { JSX } from 'preact'
 import { useEffect, useRef, useState } from 'preact/hooks'
 import Button from './Button.tsx'
 
+declare global {
+  interface Event {
+    submitter: HTMLButtonElement
+  }
+}
+
 interface Props extends JSX.HTMLAttributes<HTMLDialogElement> {
   title?: string
   close: () => void
-  onClickConfirm: (
-    event: JSX.TargetedEvent<HTMLDialogElement>
-  ) => void | Promise<void>
+  onClickConfirm: () => void | Promise<void> | false
   onClickCancel?: () => void
-  cleanup?: JSX.GenericEventHandler<HTMLDialogElement>
+  cleanup?: () => void
 }
 
 export default function Dialog({
@@ -30,12 +34,16 @@ export default function Dialog({
     } else {
       dialogRef.current?.close()
     }
-  })
+  }, [open])
 
-  async function handleClose(event: JSX.TargetedEvent<HTMLDialogElement>) {
-    setIsWorking(true)
-    if (event.currentTarget.returnValue === 'confirm') {
-      const toConfirm = onClickConfirm(event)
+  async function handleClose(value: string) {
+    if (value === 'confirm') {
+      const toConfirm = onClickConfirm()
+      if (toConfirm === false) {
+        return
+      }
+
+      setIsWorking(true)
       if (toConfirm instanceof Promise) {
         await toConfirm
       }
@@ -43,7 +51,7 @@ export default function Dialog({
       onClickCancel?.()
     }
 
-    cleanup?.(event)
+    cleanup?.()
     close()
     setIsWorking(false)
   }
@@ -52,12 +60,18 @@ export default function Dialog({
     <dialog
       ref={dialogRef}
       class="p-6 rounded-xl space-y-8 dark:bg-zinc-950 dark:text-zinc-50 dark:border-zinc-800 dark:border"
-      onClose={handleClose}
     >
       {title !== undefined && <h2 class="text-2xl font-bold">{title}</h2>}
       <div class="space-y-6 dark:text-zinc-50 dark:text-opacity-60">
         {children}
-        <form method="dialog" class="flex justify-center gap-2">
+        <form
+          method="dialog"
+          class="flex justify-center gap-2"
+          onSubmit={(event: JSX.TargetedEvent) => {
+            event.preventDefault()
+            handleClose(event.submitter.value)
+          }}
+        >
           <Button color="red" value="close">
             Cancel
           </Button>
