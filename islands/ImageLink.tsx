@@ -21,7 +21,7 @@ export default function ImageLink({
     format !== 'not convert' ? `?format=${format}` : ''
   }`
 
-  useEffect(() => setRawLink(location.origin + path))
+  useEffect(() => setRawLink(location.origin + path), [])
 
   const options = ['Not convert', 'WebP', 'AVIF'].map((option) => ({
     name: option,

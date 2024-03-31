@@ -51,13 +51,17 @@ export default function Theme() {
     setIcon(
       document.documentElement.classList.contains('dark') ? 'moon' : 'sun'
     )
-    media.addEventListener('change', (event) => {
+
+    const toggle = (event: MediaQueryListEvent) => {
       if (localStorage.getItem('theme') !== null) {
         return
       }
       setIcon(event.matches ? 'moon' : 'sun')
-    })
-  })
+    }
+
+    media.addEventListener('change', toggle)
+    return media.removeEventListener('change', toggle)
+  }, [])
 
   return (
     <div class="relative h-6">
