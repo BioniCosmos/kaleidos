@@ -30,8 +30,19 @@ export const handler: Handlers = {
       })
     }
 
+    if (!(await exists(imagePath.raw))) {
+      return ctx.renderNotFound()
+    }
+
+    if (needConvert && !(await exists(actualPath))) {
+      await (
+        await processImage(imagePath.raw)
+      )(actualPath, { format, isThumbnail })
+    }
+
+    const imageFile = await Deno.readFile(actualPath)
     const eTag = `"${await crypto.subtle
-      .digest('SHA-1', new TextEncoder().encode(actualPath))
+      .digest('SHA-1', imageFile)
       .then((hash) =>
         Array.from(new Uint8Array(hash))
           .map((byte) => byte.toString(16).padStart(2, '0'))
@@ -42,17 +53,6 @@ export const handler: Handlers = {
       return new Response(null, { status: 304, headers })
     }
 
-    if (needConvert && !(await exists(actualPath))) {
-      await (
-        await processImage(imagePath.raw)
-      )(actualPath, { format, isThumbnail })
-    }
-
-    try {
-      const imageFile = await Deno.readFile(actualPath)
-      return new Response(imageFile, { headers })
-    } catch {
-      return ctx.renderNotFound()
-    }
+    return new Response(imageFile, { headers })
   },
 }
