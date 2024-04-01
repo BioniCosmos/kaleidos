@@ -74,7 +74,9 @@ async function saveImage(db: DB, imageFile: File, albumId: number) {
   const path = imagePath.toString()
   const size = imageFile.size
 
-  const image = await processImage(await imageFile.arrayBuffer())
+  const { width, height, image } = await processImage(
+    await imageFile.arrayBuffer()
+  )
   const jobs = [
     image(imagePath.raw),
     image(imagePath.thumbnail(), { isThumbnail: true }),
@@ -82,7 +84,10 @@ async function saveImage(db: DB, imageFile: File, albumId: number) {
       image(imagePath.thumbnail(format), { format, isThumbnail: true })
     ),
   ]
-  await Promise.all(jobs)
+  const results = await Promise.all(jobs)
+  const { width: thumbnailWidth, height: thumbnailHeight } = results.find(
+    ({ isThumbnail }) => isThumbnail
+  )!.info
 
   db.queryEntries(
     `
@@ -93,10 +98,25 @@ async function saveImage(db: DB, imageFile: File, albumId: number) {
     :date,
     :albumId,
     :path,
-    :size
+    :size,
+    :width,
+    :height,
+    :thumbnailWidth,
+    :thumbnailHeight
   )
 `,
-    { name, ext, date, albumId, path, size } satisfies Omit<Image, 'id'>
+    {
+      name,
+      ext,
+      date,
+      albumId,
+      path,
+      size,
+      width,
+      height,
+      thumbnailWidth,
+      thumbnailHeight,
+    } satisfies Omit<Image, 'id'>
   )
 }
 

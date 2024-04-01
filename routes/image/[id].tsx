@@ -93,7 +93,12 @@ export default defineRoute<State>((_req, ctx) => {
         />
       </div>
       <a href={rawPath}>
-        <img src={rawPath} class="max-h-[75vh] mx-auto" />
+        <img
+          src={rawPath}
+          class="max-h-[75vh] mx-auto w-auto"
+          width={image.width}
+          height={image.height}
+        />
       </a>
       <div class="space-y-4 text-sm mt-6">
         <ul class="space-y-3 text-gray-700">

@@ -8,6 +8,10 @@ export type Image = {
   albumId: number
   path: string
   size: number
+  width: number
+  height: number
+  thumbnailWidth: number
+  thumbnailHeight: number
 }
 
 export type Album = {
@@ -26,13 +30,17 @@ export type User = {
 export function createImageTable(db: DB) {
   db.execute(`
     CREATE TABLE IF NOT EXISTS images(
-      id      INTEGER PRIMARY KEY NOT NULL,
-      name    TEXT NOT NULL,
-      ext     TEXT NOT NULL,
-      date    INTEGER NOT NULL,
-      albumId INTEGER NOT NULL REFERENCES albums,
-      path    TEXT NOT NULL,
-      size    INTEGER NOT NULL
+      id              INTEGER PRIMARY KEY NOT NULL,
+      name            TEXT NOT NULL,
+      ext             TEXT NOT NULL,
+      date            INTEGER NOT NULL,
+      albumId         INTEGER NOT NULL REFERENCES albums,
+      path            TEXT NOT NULL,
+      size            INTEGER NOT NULL,
+      width           INTEGER NOT NULL,
+      height          INTEGER NOT NULL,
+      thumbnailWidth  INTEGER NOT NULL,
+      thumbnailHeight INTEGER NOT NULL
     )
   `)
 }

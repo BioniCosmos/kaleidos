@@ -94,10 +94,14 @@ export async function processImage(
     | string
 ) {
   const origin = sharp(input)
-  const { orientation } = await origin.metadata()
-  origin.keepIccProfile().withExif({}).withMetadata({ orientation })
+  const metadata = await origin.metadata()
+  const { width, height } = getNormalSize(metadata)
 
-  return async (
+  origin
+    .keepIccProfile()
+    .withExif({})
+    .withMetadata({ orientation: metadata.orientation })
+  const image = async (
     output: string,
     options?: { format?: Format; isThumbnail?: boolean }
   ) => {
@@ -105,7 +109,10 @@ export async function processImage(
     if (options !== undefined) {
       const { isThumbnail, format } = options
       if (isThumbnail) {
-        image = image.resize(512)
+        image = image.resize({
+          withoutEnlargement: true,
+          [width > height ? 'width' : 'height']: 512,
+        })
       }
       if (format !== undefined) {
         image = image.toFormat(format)
@@ -113,6 +120,19 @@ export async function processImage(
     }
 
     await ensureFile(output)
-    return image.toFile(output)
+    return {
+      info: await image.toFile(output),
+      isThumbnail: options?.isThumbnail ?? false,
+    }
   }
+
+  return { width, height, image }
+}
+
+function getNormalSize({ width, height, orientation }: sharp.Metadata) {
+  width = width!
+  height = height!
+  return (orientation ?? 0) >= 5
+    ? { width: height, height: width }
+    : { width, height }
 }
