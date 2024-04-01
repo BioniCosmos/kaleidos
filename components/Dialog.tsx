@@ -2,12 +2,6 @@ import type { JSX } from 'preact'
 import { useEffect, useRef, useState } from 'preact/hooks'
 import Button from './Button.tsx'
 
-declare global {
-  interface Event {
-    submitter: HTMLButtonElement
-  }
-}
-
 interface Props extends JSX.HTMLAttributes<HTMLDialogElement> {
   title?: string
   close: () => void
@@ -67,9 +61,9 @@ export default function Dialog({
         <form
           method="dialog"
           class="flex justify-center gap-2"
-          onSubmit={(event: JSX.TargetedEvent) => {
+          onSubmit={(event) => {
             event.preventDefault()
-            handleClose(event.submitter.value)
+            handleClose((event.submitter as HTMLButtonElement).value)
           }}
         >
           <Button color="red" value="close">

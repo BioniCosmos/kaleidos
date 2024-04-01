@@ -8,6 +8,7 @@ import ImageInfo from '../../islands/ImageInfo.tsx'
 import ImageLink from '../../islands/ImageLink.tsx'
 import { redirect } from '../../utils.ts'
 import type { State } from '../_middleware.ts'
+import { authorizeAlbumOwner, authorizeImageOwner } from './_common.ts'
 
 export const handler: Handlers<unknown, State> = {
   async POST(req, ctx) {
@@ -15,23 +16,15 @@ export const handler: Handlers<unknown, State> = {
     const name = formData.get('name') as string
     const albumId = Number(formData.get('albumId') as string)
     const { id } = ctx.params
+    const imageId = Number(id)
 
     const { db, user } = ctx.state
     const { id: userId, isAdmin } = user
 
-    const [{ userId: imageUserId }] = db.queryEntries<Pick<Image, 'userId'>>(
-      'SELECT userId FROM images WHERE id = :id',
-      { id }
-    )
-    if (imageUserId !== userId && !isAdmin) {
-      return redirect('/error?message=No access')
-    }
-
-    const [{ userId: albumUserId }] = db.queryEntries<Pick<Album, 'userId'>>(
-      'SELECT userId FROM albums WHERE id = ?',
-      [albumId]
-    )
-    if (albumUserId !== userId && !isAdmin) {
+    if (
+      !authorizeImageOwner(db, [imageId], userId, isAdmin) ||
+      !authorizeAlbumOwner(db, albumId, userId, isAdmin)
+    ) {
       return redirect('/error?message=No access')
     }
 
@@ -48,7 +41,26 @@ export default defineRoute<State>((_req, ctx) => {
   const { id: userId, isAdmin } = user
 
   const image = db
-    .queryEntries<Image>('SELECT * FROM images WHERE id = :id', ctx.params)
+    .queryEntries<
+      Image & {
+        albumName: Album['name']
+        userName: User['name']
+        userId: User['id']
+      }
+    >(
+      `
+      SELECT 
+        images.*,
+        albums.name albumName,
+        users.name  userName,
+        users.id    userId
+      FROM images
+      JOIN albums ON albumId = albums.id
+      JOIN users ON userId = users.id
+      WHERE images.id = :id
+      `,
+      ctx.params
+    )
     .at(0)
   if (image === undefined) {
     return ctx.renderNotFound()
@@ -58,21 +70,11 @@ export default defineRoute<State>((_req, ctx) => {
     return redirect('/error?message=No access')
   }
 
-  const albumName = db.queryEntries<Pick<Album, 'name'>>(
-    'SELECT name FROM albums WHERE id = ?',
-    [image.albumId]
-  )[0].name
-
-  const [{ name: userName }] = db.queryEntries<Pick<User, 'name'>>(
-    'SELECT name FROM users WHERE id = ?',
-    [image.userId]
-  )
-
   const info = (
     [
       ['calendar', new Date(image.date).toLocaleString()],
-      ['folder', albumName],
-      ['user', userName !== '' ? userName : image.userId],
+      ['folder', image.albumName],
+      ['user', image.userName !== '' ? image.userName : image.userId],
     ] satisfies [FeatherIconNames, string][]
   ).map(([iconName, value]) => ({
     icon: <Icon name={iconName} options={{ width: 20, height: 20 }} />,

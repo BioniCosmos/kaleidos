@@ -5,7 +5,6 @@ export type Image = {
   name: string
   ext: string
   date: number
-  userId: string
   albumId: number
   path: string
   size: number
@@ -31,7 +30,6 @@ export function createImageTable(db: DB) {
       name    TEXT NOT NULL,
       ext     TEXT NOT NULL,
       date    INTEGER NOT NULL,
-      userId  TEXT NOT NULL REFERENCES users,
       albumId INTEGER NOT NULL REFERENCES albums,
       path    TEXT NOT NULL,
       size    INTEGER NOT NULL

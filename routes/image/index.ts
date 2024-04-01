@@ -3,21 +3,19 @@ import { existsSync } from '$std/fs/mod.ts'
 import { basename, join } from '$std/path/mod.ts'
 import type { DB } from 'sqlite'
 import { ImagePath, formats, processImage } from '../../ImagePath.ts'
-import { type Album, type Image } from '../../db.ts'
+import type { Image } from '../../db.ts'
 import { getTime, redirect } from '../../utils.ts'
 import type { State } from '../_middleware.ts'
+import { authorizeAlbumOwner, authorizeImageOwner } from './_common.ts'
 
 export const handler: Handlers<unknown, State> = {
   async POST(req, ctx) {
     const formData = await req.formData()
     const imageFiles = formData.getAll('imageFile') as File[]
-
-    const { db, user } = ctx.state
-    const { id: userId } = user
-
+    const { db } = ctx.state
     const albumId = Number(formData.get('albumId') as string)
     const jobs = imageFiles.map((imageFile) =>
-      saveImage(db, imageFile, userId, albumId)
+      saveImage(db, imageFile, albumId)
     )
     await Promise.all(jobs)
 
@@ -36,18 +34,11 @@ export const handler: Handlers<unknown, State> = {
     const { id, selectedIds }: { id: number; selectedIds?: number[] } =
       await req.json()
     const ids = selectedIds ?? [id]
-    const jobs = ids.map((id) => deleteImage(db, id))
-
-    const userIds = db.queryEntries<Pick<Image, 'userId'>>(
-      `SELECT userId FROM images WHERE id IN (${ids.join(', ')})`
-    )
-    if (
-      userIds.some(({ userId: imageUserId }) => imageUserId !== userId) &&
-      !isAdmin
-    ) {
+    if (!authorizeImageOwner(db, ids, userId, isAdmin)) {
       return redirect('/error?message=No access')
     }
 
+    const jobs = ids.map((id) => deleteImage(db, id))
     const [albumId] = await Promise.all(jobs)
     return redirect(`/album/${albumId}`)
   },
@@ -60,21 +51,10 @@ export const handler: Handlers<unknown, State> = {
     const { db, user } = ctx.state
     const { id: userId, isAdmin } = user
 
-    const userIds = db.queryEntries<Pick<Image, 'userId'>>(
-      `SELECT userId FROM images WHERE id IN (${joinedIds})`
-    )
     if (
-      userIds.some(({ userId: imageUserId }) => imageUserId !== userId) &&
-      !isAdmin
+      !authorizeImageOwner(db, ids, userId, isAdmin) ||
+      !authorizeAlbumOwner(db, albumId, userId, isAdmin)
     ) {
-      return redirect('/error?message=No access')
-    }
-
-    const [{ userId: albumUserId }] = db.queryEntries<Pick<Album, 'userId'>>(
-      'SELECT userId FROM albums WHERE id = ?',
-      [albumId]
-    )
-    if (albumUserId !== userId && !isAdmin) {
       return redirect('/error?message=No access')
     }
 
@@ -86,12 +66,7 @@ export const handler: Handlers<unknown, State> = {
   },
 }
 
-async function saveImage(
-  db: DB,
-  imageFile: File,
-  userId: string,
-  albumId: number
-) {
+async function saveImage(db: DB, imageFile: File, albumId: number) {
   const time = getTime()
   const imagePath = await ImagePath.from(imageFile, time)
 
@@ -118,13 +93,12 @@ async function saveImage(
     :name,
     :ext,
     :date,
-    :userId,
     :albumId,
     :path,
     :size
   )
 `,
-    { name, ext, date, userId, albumId, path, size } satisfies Omit<Image, 'id'>
+    { name, ext, date, albumId, path, size } satisfies Omit<Image, 'id'>
   )
 }
 

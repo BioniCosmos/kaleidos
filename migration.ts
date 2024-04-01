@@ -63,7 +63,6 @@ interface OriginalImage {
   image_name: string
   image_extension: string
   image_date: Date
-  image_user_id: number
   image_album_id: number
   image_size: number
 }
@@ -75,20 +74,17 @@ const images: Image[] = await Promise.all(
       image_name: name,
       image_extension: ext,
       image_date,
-      image_user_id,
       image_album_id: albumId,
       image_size: size,
     }) => {
       const time = getTime(image_date)
       const date = time.time
-      const userId = await findUserNameById(image_user_id)
       const path = (await ImagePath.from(`${name}.${ext}`, time)).toString()
       return {
         id,
         name,
         ext,
         date,
-        userId,
         albumId,
         path,
         size,
@@ -105,7 +101,6 @@ images.forEach((image) => {
       :name,
       :ext,
       :date,
-      :userId,
       :albumId,
       :path,
       :size
