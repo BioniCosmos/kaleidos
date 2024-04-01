@@ -1,44 +1,23 @@
-import type { JSX } from 'preact'
 import { useState } from 'preact/hooks'
 import Dialog from '../components/Dialog.tsx'
 import FloatButton from '../components/FloatButton.tsx'
 import { sendJSON, setToArray } from '../utils.ts'
 
-interface CommonProps {
+interface Props {
   target: 'image' | 'album'
+  idSet: Set<number>
 }
 
-interface IdProps extends CommonProps {
-  id: number
-}
-
-interface SelectedIdsProps extends CommonProps {
-  selectedIds: Set<number>
-}
-
-export default function DeleteSelection({ target, id }: IdProps): JSX.Element
-export default function DeleteSelection({
-  target,
-  selectedIds,
-}: SelectedIdsProps): JSX.Element
-
-export default function DeleteSelection({
-  target,
-  ...props
-}: IdProps | SelectedIdsProps) {
+export default function DeleteSelection({ target, idSet }: Props) {
   const [open, setOpen] = useState(false)
 
   function openDialog() {
     setOpen(true)
   }
 
-  const submit = sendJSON(
-    target,
-    'DELETE',
-    'id' in props
-      ? { id: props.id }
-      : { selectedIds: setToArray(props.selectedIds) }
-  )
+  const submit = sendJSON(target, 'DELETE', {
+    ids: setToArray(idSet),
+  })
 
   return (
     <>

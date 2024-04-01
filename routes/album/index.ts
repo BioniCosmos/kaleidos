@@ -22,9 +22,7 @@ export const handler: Handlers<unknown, State> = {
     const { db, user } = ctx.state
     const { id: userId, isAdmin } = user
 
-    const { id, selectedIds }: { id: number; selectedIds?: number[] } =
-      await req.json()
-    const ids = selectedIds ?? [id]
+    const { ids }: { ids: number[] } = await req.json()
     const userIds = db.queryEntries<Pick<Album, 'userId'>>(
       `SELECT userId FROM albums WHERE id IN (${ids.join(', ')})`
     )

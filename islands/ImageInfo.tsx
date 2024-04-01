@@ -23,7 +23,7 @@ export default function ImageInfo({
     return form?.reportValidity() ? form.submit() : false
   }
 
-  const deleteSubmit = sendJSON('image', 'DELETE', { id: image.id })
+  const deleteSubmit = sendJSON('image', 'DELETE', { ids: [image.id] })
 
   return (
     <>

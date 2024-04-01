@@ -98,7 +98,7 @@ export default function Images({
               iconName="send"
               onClick={() => setOpen(true)}
             />
-            <DeleteSelection target="image" selectedIds={selectedIds} />
+            <DeleteSelection target="image" idSet={selectedIds} />
           </div>
         ) : (
           <UploadImage albumId={albumId} />

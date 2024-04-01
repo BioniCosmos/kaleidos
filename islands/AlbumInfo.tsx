@@ -22,7 +22,7 @@ export default function AlbumInfo({
     return form?.reportValidity() ? form.submit() : false
   }
 
-  const deleteSubmit = sendJSON('album', 'DELETE', { id: album.id })
+  const deleteSubmit = sendJSON('album', 'DELETE', { ids: [album.id] })
 
   return (
     <>

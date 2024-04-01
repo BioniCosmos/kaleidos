@@ -57,7 +57,7 @@ export default function Albums({ albums }: { albums: Album[] }) {
           isNone={albums.length === 0}
         />
         {selectedIds.size > 0 ? (
-          <DeleteSelection target="album" selectedIds={selectedIds} />
+          <DeleteSelection target="album" idSet={selectedIds} />
         ) : (
           <NewAlbum />
         )}

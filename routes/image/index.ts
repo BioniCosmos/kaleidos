@@ -31,9 +31,7 @@ export const handler: Handlers<unknown, State> = {
     const { db, user } = ctx.state
     const { id: userId, isAdmin } = user
 
-    const { id, selectedIds }: { id: number; selectedIds?: number[] } =
-      await req.json()
-    const ids = selectedIds ?? [id]
+    const { ids }: { ids: number[] } = await req.json()
     if (!authorizeImageOwner(db, ids, userId, isAdmin)) {
       return redirect('/error?message=No access')
     }
