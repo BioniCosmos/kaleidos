@@ -3,7 +3,12 @@ import { join } from '$std/path/mod.ts'
 import { DB } from 'sqlite'
 import config from '../config.ts'
 import type { User } from '../db.ts'
-import { createAlbumTable, createImageTable, createUserTable } from '../db.ts'
+import {
+  createAlbumTable,
+  createImageTable,
+  createSettingTable,
+  createUserTable,
+} from '../db.ts'
 import { redirect, verifyToken } from '../utils.ts'
 
 export async function handler(req: Request, ctx: FreshContext<State>) {
@@ -15,7 +20,7 @@ export async function handler(req: Request, ctx: FreshContext<State>) {
     return ctx.next()
   }
 
-  const isToLogin = ctx.route === '/login'
+  const isToLoginOrSignup = ctx.route === '/login' || ctx.route === '/signup'
   const userId = await verifyToken(req.headers.get('Cookie'))
   const isValid = userId !== null
 
@@ -27,10 +32,10 @@ export async function handler(req: Request, ctx: FreshContext<State>) {
    * | 1           | 0         | -           |
    * | 1           | 1         | to `/`      |
    */
-  if (!isToLogin && !isValid) {
+  if (!isToLoginOrSignup && !isValid) {
     return redirect('/login')
   }
-  if (isToLogin && isValid) {
+  if (isToLoginOrSignup && isValid) {
     return redirect('/')
   }
 
@@ -52,6 +57,7 @@ export class State {
       createUserTable(State.#db)
       createAlbumTable(State.#db)
       createImageTable(State.#db)
+      createSettingTable(State.#db)
 
       if (userInit) {
         const defaultPassword = hash('123456')
@@ -81,6 +87,7 @@ export class State {
         'SELECT * FROM users WHERE id = ?',
         [userId]
       )
+      user.isAdmin = (user.isAdmin as unknown as number) === 1
       State.#user = user
     } else {
       State.#user = undefined

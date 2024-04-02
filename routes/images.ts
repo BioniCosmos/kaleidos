@@ -35,9 +35,8 @@ export const handler: Handlers = {
     }
 
     if (needConvert && !(await exists(actualPath))) {
-      await (
-        await processImage(imagePath.raw)
-      )(actualPath, { format, isThumbnail })
+      const { image } = await processImage(imagePath.raw)
+      await image(actualPath, { format, isThumbnail })
     }
 
     const imageFile = await Deno.readFile(actualPath)

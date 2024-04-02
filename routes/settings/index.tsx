@@ -1,4 +1,5 @@
 import type { PageProps } from '$fresh/server.ts'
+import AdminSettings from '../../components/AdminSettings.tsx'
 import Button from '../../components/Button.tsx'
 import Form from '../../components/Form.tsx'
 import Input from '../../components/Input.tsx'
@@ -6,7 +7,8 @@ import Title from '../../components/Title.tsx'
 import type { State } from '../_middleware.ts'
 
 export default function Settings({ state }: PageProps<unknown, State>) {
-  const { name } = state.user
+  const { user, db } = state
+  const { name, isAdmin } = user
   return (
     <>
       <Title>Settings</Title>
@@ -37,6 +39,12 @@ export default function Settings({ state }: PageProps<unknown, State>) {
           />
           <Button>Save changes</Button>
         </Form>
+        {isAdmin && (
+          <>
+            <hr />
+            <AdminSettings db={db} />
+          </>
+        )}
       </div>
     </>
   )

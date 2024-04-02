@@ -14,9 +14,11 @@ import * as $images from "./routes/images.ts";
 import * as $index from "./routes/index.tsx";
 import * as $login from "./routes/login.tsx";
 import * as $logout from "./routes/logout.ts";
+import * as $settings_admin from "./routes/settings/admin.ts";
 import * as $settings_index from "./routes/settings/index.tsx";
 import * as $settings_password from "./routes/settings/password.ts";
 import * as $settings_profile from "./routes/settings/profile.ts";
+import * as $signup from "./routes/signup.tsx";
 import * as $AlbumInfo from "./islands/AlbumInfo.tsx";
 import * as $Albums from "./islands/Albums.tsx";
 import * as $DeleteSelection from "./islands/DeleteSelection.tsx";
@@ -42,9 +44,11 @@ const manifest = {
     "./routes/index.tsx": $index,
     "./routes/login.tsx": $login,
     "./routes/logout.ts": $logout,
+    "./routes/settings/admin.ts": $settings_admin,
     "./routes/settings/index.tsx": $settings_index,
     "./routes/settings/password.ts": $settings_password,
     "./routes/settings/profile.ts": $settings_profile,
+    "./routes/signup.tsx": $signup,
   },
   islands: {
     "./islands/AlbumInfo.tsx": $AlbumInfo,

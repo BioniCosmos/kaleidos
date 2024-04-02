@@ -27,6 +27,11 @@ export type User = {
   isAdmin: boolean
 }
 
+export type Setting = {
+  key: string
+  value: string
+}
+
 export function createImageTable(db: DB) {
   db.execute(`
     CREATE TABLE IF NOT EXISTS images(
@@ -66,6 +71,16 @@ export function createUserTable(db: DB) {
   `)
 }
 
+export function createSettingTable(db: DB) {
+  db.execute(`
+    CREATE TABLE IF NOT EXISTS settings (
+      key   TEXT PRIMARY KEY NOT NULL,
+      value TEXT NOT NULL
+    )
+  `)
+  db.execute(`INSERT OR IGNORE INTO settings VALUES ('signup', 'disable')`)
+}
+
 export function getAlbumOptions(db: DB, userId: string, isAdmin: boolean) {
   // prettier-ignore
   const query = (db.queryEntries<Pick<Album, 'id' | 'name'>>).bind(db)
@@ -73,4 +88,15 @@ export function getAlbumOptions(db: DB, userId: string, isAdmin: boolean) {
     ? query('SELECT id, name FROM albums')
     : query('SELECT id, name FROM albums WHERE userId = :userId', { userId })
   return albums.map(({ id, name }) => ({ value: id, name }))
+}
+
+export interface SettingMap {
+  signup: 'enable' | 'disable'
+}
+
+export function getSettings(db: DB) {
+  const settings = db.queryEntries<Setting>(`SELECT * FROM settings`)
+  return Object.fromEntries(
+    settings.map(({ key, value }) => [key, value])
+  ) as unknown as SettingMap
 }

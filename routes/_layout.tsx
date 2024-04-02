@@ -34,7 +34,7 @@ export default function Layout({
       </header>
       <main
         class={
-          route !== '/login'
+          route !== '/login' && route !== '/signup'
             ? 'p-4 pt-6'
             : 'h-[calc(100dvh_-_2.75rem)] flex items-center justify-center'
         }
