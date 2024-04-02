@@ -1,6 +1,6 @@
 import type { Handlers } from '$fresh/server.ts'
-import { existsSync } from '$std/fs/mod.ts'
-import { basename, join } from '$std/path/mod.ts'
+import { ensureDirSync, existsSync } from '$std/fs/mod.ts'
+import { basename, dirname, join } from '$std/path/mod.ts'
 import type { DB } from 'sqlite'
 import { ImagePath, formats, processImage } from '../../ImagePath.ts'
 import type { Image } from '../../db.ts'
@@ -89,35 +89,51 @@ async function saveImage(db: DB, imageFile: File, albumId: number) {
     ({ isThumbnail }) => isThumbnail
   )!.info
 
-  db.queryEntries(
-    `
-  INSERT INTO images VALUES (
-    NULL,
-    :name,
-    :ext,
-    :date,
-    :albumId,
-    :path,
-    :size,
-    :width,
-    :height,
-    :thumbnailWidth,
-    :thumbnailHeight
-  )
-`,
-    {
-      name,
-      ext,
-      date,
-      albumId,
-      path,
-      size,
-      width,
-      height,
-      thumbnailWidth,
-      thumbnailHeight,
-    } satisfies Omit<Image, 'id'>
-  )
+  db.transaction(() => {
+    const records = Array.of<string>()
+    try {
+      db.queryEntries(
+        `
+      INSERT INTO images VALUES (
+        NULL,
+        :name,
+        :ext,
+        :date,
+        :albumId,
+        :path,
+        :size,
+        :width,
+        :height,
+        :thumbnailWidth,
+        :thumbnailHeight
+      )
+      `,
+        {
+          name,
+          ext,
+          date,
+          albumId,
+          path,
+          size,
+          width,
+          height,
+          thumbnailWidth,
+          thumbnailHeight,
+        } satisfies Omit<Image, 'id'>
+      )
+
+      results.forEach(({ file, tmpFile }) => {
+        ensureDirSync(dirname(file))
+        Deno.copyFileSync(tmpFile, file)
+        records.push(file)
+      })
+    } catch (error) {
+      records.forEach((record) => Deno.removeSync(record))
+      throw error
+    } finally {
+      results.forEach(({ tmpFile }) => Deno.remove(tmpFile))
+    }
+  })
 }
 
 export function deleteImage(db: DB, id: number) {

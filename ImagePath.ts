@@ -1,4 +1,4 @@
-import { ensureFile, exists } from '$std/fs/mod.ts'
+import { exists } from '$std/fs/mod.ts'
 import { join, parse, type ParsedPath } from '$std/path/mod.ts'
 import sharp from 'sharp'
 import config from './config.ts'
@@ -119,10 +119,12 @@ export async function processImage(
       }
     }
 
-    await ensureFile(output)
+    const tmpFile = await Deno.makeTempFile()
     return {
-      info: await image.toFile(output),
+      info: await image.toFile(tmpFile),
       isThumbnail: options?.isThumbnail ?? false,
+      file: output,
+      tmpFile,
     }
   }
 
