@@ -85,9 +85,6 @@ async function saveImage(db: DB, imageFile: File, albumId: number) {
     ),
   ]
   const results = await Promise.all(jobs)
-  const { width: thumbnailWidth, height: thumbnailHeight } = results.find(
-    ({ isThumbnail }) => isThumbnail
-  )!.info
 
   db.transaction(() => {
     const records = Array.of<string>()
@@ -103,9 +100,7 @@ async function saveImage(db: DB, imageFile: File, albumId: number) {
         :path,
         :size,
         :width,
-        :height,
-        :thumbnailWidth,
-        :thumbnailHeight
+        :height
       )
       `,
         {
@@ -117,8 +112,6 @@ async function saveImage(db: DB, imageFile: File, albumId: number) {
           size,
           width,
           height,
-          thumbnailWidth,
-          thumbnailHeight,
         } satisfies Omit<Image, 'id'>
       )
 

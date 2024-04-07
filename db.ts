@@ -10,8 +10,6 @@ export type Image = {
   size: number
   width: number
   height: number
-  thumbnailWidth: number
-  thumbnailHeight: number
 }
 
 export type Album = {
@@ -43,9 +41,7 @@ export function createImageTable(db: DB) {
       path            TEXT NOT NULL,
       size            INTEGER NOT NULL,
       width           INTEGER NOT NULL,
-      height          INTEGER NOT NULL,
-      thumbnailWidth  INTEGER NOT NULL,
-      thumbnailHeight INTEGER NOT NULL
+      height          INTEGER NOT NULL
     )
   `)
 }

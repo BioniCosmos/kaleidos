@@ -122,7 +122,6 @@ export async function processImage(
     const tmpFile = await Deno.makeTempFile()
     return {
       info: await image.toFile(tmpFile),
-      isThumbnail: options?.isThumbnail ?? false,
       file: output,
       tmpFile,
     }

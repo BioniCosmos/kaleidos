@@ -59,7 +59,7 @@ export default function Images({
   return (
     <>
       <Grid>
-        {images.map(({ id, path, thumbnailWidth, thumbnailHeight }) => (
+        {images.map(({ id, path }) => (
           <a href={`/image/${id}`} class="relative group">
             <picture>
               <source
@@ -74,8 +74,6 @@ export default function Images({
                 src={join('/images', `${path}?thumbnail=true`)}
                 loading="lazy"
                 class="w-full h-48 object-cover hover:scale-105 transition rounded shadow hover:shadow-lg"
-                width={thumbnailWidth}
-                height={thumbnailHeight}
               />
             </picture>
             <Checkbox
