@@ -78,7 +78,7 @@
    ```shellsession
    $ git clone https://github.com/BioniCosmos/kaleidos.git
    $ cd kaleidos
-   $ git checkout v2.0.0
+   $ git checkout v2.0.1
    ```
 
 2. Modify the configuration file. (`config.ts` for Kaleidos and `fresh.config.ts` for Fresh)

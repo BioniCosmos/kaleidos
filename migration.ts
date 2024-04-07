@@ -20,11 +20,8 @@ const legacyImages = db.queryEntries<LegacyImage>('SELECT * FROM images')
 const jobs = legacyImages.map(async (image) => {
   const imagePath = new ImagePath(image.path)
   const { width, height } = await processImage(imagePath.raw)
-  return {
-    ...image,
-    width,
-    height,
-  }
+  const { userId: _userId, ...newImage } = image
+  return { ...newImage, width, height }
 })
 const images = await Promise.all(jobs)
 
@@ -46,23 +43,28 @@ db.transaction(() => {
       value TEXT NOT NULL
     );
   `)
-  images.forEach(
-    ({ id, name, ext, date, albumId, path, size, width, height }) => {
-      db.execute(`
-      INSERT INTO images VALUES (
-        ${id},
-        ${name},
-        ${ext},
-        ${date},
-        ${albumId},
-        ${path},
-        ${size},
-        ${width},
-        ${height}
-      )
-    `)
-    }
-  )
+  images.forEach((image) => {
+    db.query(
+      `
+        INSERT INTO images_new VALUES (
+          :id,
+          :name,
+          :ext,
+          :date,
+          :albumId,
+          :path,
+          :size,
+          :width,
+          :height
+        )
+      `,
+      image
+    )
+  })
+  db.execute(`
+    DROP TABLE images;
+    ALTER TABLE images_new RENAME TO images;
+  `)
 })
 
 db.close()
