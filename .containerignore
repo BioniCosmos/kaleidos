@@ -21,7 +21,6 @@ node_modules/
 **/main.go
 Containerfile
 LICENSE
-migration.ts
 README.md
 .gitignore
 .containerignore

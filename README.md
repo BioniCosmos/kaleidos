@@ -78,7 +78,7 @@
    ```shellsession
    $ git clone https://github.com/BioniCosmos/kaleidos.git
    $ cd kaleidos
-   $ git checkout v1.4.0
+   $ git checkout v2.0.0
    ```
 
 2. Modify the configuration file. (`config.ts` for Kaleidos and `fresh.config.ts` for Fresh)
@@ -86,4 +86,29 @@
 
    ```shellsession
    $ deno run -A main.ts
+   ```
+
+## Upgrade from v1 to v2
+
+1. Pull the latest image.
+
+   ```shellsession
+   $ sudo podman pull ghcr.io/bionicosmos/kaleidos:latest
+   ```
+
+2. Run the migration script to update the database.
+
+   ```shellsession
+   $ sudo podman run \
+     --rm \
+     -v /opt/container/kaleidos/config.ts:/app/config.ts \
+     -v /opt/container/kaleidos/data:/app/data \
+     kaleidos \
+     run -A migration.ts
+   ```
+
+3. Restart the container.
+
+   ```shellsession
+   $ sudo systemctl restart container-kaleidos.service
    ```
