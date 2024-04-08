@@ -1,6 +1,7 @@
 import { type Handlers, type RouteConfig } from '$fresh/server.ts'
-import { exists } from '$std/fs/mod.ts'
+import { ensureDir, exists } from '$std/fs/mod.ts'
 import { contentType } from '$std/media_types/mod.ts'
+import { dirname } from '$std/path/mod.ts'
 import { ImagePath, formats, processImage, type Format } from '../ImagePath.ts'
 
 export const config: RouteConfig = {
@@ -34,9 +35,11 @@ export const handler: Handlers = {
       return ctx.renderNotFound()
     }
 
-    if (needConvert && !(await exists(actualPath))) {
+    if ((needConvert || isThumbnail) && !(await exists(actualPath))) {
       const { image } = await processImage(imagePath.raw)
-      await image(actualPath, { format, isThumbnail })
+      const { file, tmpFile } = await image(actualPath, { format, isThumbnail })
+      await ensureDir(dirname(file))
+      await Deno.rename(tmpFile, file)
     }
 
     const imageFile = await Deno.readFile(actualPath)

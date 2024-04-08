@@ -10,12 +10,12 @@ export const handler: Handlers<unknown, State> = {
     }
 
     const formData = await req.formData()
-    const signup = formData.get('signup')
-    if (signup !== 'enable' && signup !== 'disable') {
-      return redirect('/error?message=invalid values')
-    }
-
-    db.query(`UPDATE settings SET value = ? WHERE key = 'signup'`, [signup])
+    ;[...formData.entries()].forEach(([key, value]) =>
+      db.query('UPDATE settings SET value = ? WHERE key = ?', [
+        value as string,
+        key,
+      ])
+    )
     return redirect('/settings')
   },
 }

@@ -74,7 +74,11 @@ export function createSettingTable(db: DB) {
       value TEXT NOT NULL
     )
   `)
-  db.execute(`INSERT OR IGNORE INTO settings VALUES ('signup', 'disable')`)
+  db.execute(`
+    INSERT OR IGNORE INTO settings VALUES ('signup', 'disable');
+    INSERT OR IGNORE INTO settings VALUES ('formatPreprocess', 'disable');
+    INSERT OR IGNORE INTO settings VALUES ('thumbnailPreprocess', 'disable');
+  `)
 }
 
 export function getAlbumOptions(db: DB, userId: string, isAdmin: boolean) {
@@ -88,6 +92,8 @@ export function getAlbumOptions(db: DB, userId: string, isAdmin: boolean) {
 
 export interface SettingMap {
   signup: 'enable' | 'disable'
+  formatPreprocess: 'enable' | 'disable'
+  thumbnailPreprocess: 'enable' | 'disable'
 }
 
 export function getSettings(db: DB) {

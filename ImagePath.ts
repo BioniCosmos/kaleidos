@@ -69,8 +69,9 @@ export class ImagePath {
     return this.#originalName ?? this.name
   }
 
-  thumbnail(format?: Format) {
-    const convertExt = format !== undefined ? `.${format}` : ''
+  thumbnail(format?: Format | null) {
+    const convertExt =
+      format !== undefined && format !== null ? `.${format}` : ''
     return join(this.tmpDir, `${this.name}.tn.${this.ext}${convertExt}`)
   }
 
@@ -103,7 +104,7 @@ export async function processImage(
     .withMetadata({ orientation: metadata.orientation })
   const image = async (
     output: string,
-    options?: { format?: Format; isThumbnail?: boolean }
+    options?: { format?: Format | null; isThumbnail?: boolean }
   ) => {
     let image = origin.clone()
     if (options !== undefined) {
@@ -114,7 +115,7 @@ export async function processImage(
           [width > height ? 'width' : 'height']: 512,
         })
       }
-      if (format !== undefined) {
+      if (format !== undefined && format !== null) {
         image = image.toFormat(format)
       }
     }

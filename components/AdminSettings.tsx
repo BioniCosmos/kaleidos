@@ -9,15 +9,32 @@ export default function AdminSettings({ db }: { db: DB }) {
     value: name.toLowerCase(),
     name,
   }))
-  const { signup } = getSettings(db)
+  const settings = getSettings(db)
+  const settingItems = (
+    [
+      {
+        label: 'Signup',
+        name: 'signup',
+      },
+      {
+        label: 'Format images when uploading',
+        name: 'formatPreprocess',
+      },
+      {
+        label: 'Generate thumbnails when uploading',
+        name: 'thumbnailPreprocess',
+      },
+    ] as const
+  ).map((item) => (
+    <SelectMenu
+      {...item}
+      options={options}
+      defaultValue={settings[item.name]}
+    />
+  ))
   return (
     <Form method="post" action="/settings/admin">
-      <SelectMenu
-        label="Signup"
-        name="signup"
-        options={options}
-        defaultValue={signup}
-      />
+      {settingItems}
       <Button>Save changes</Button>
     </Form>
   )

@@ -4,6 +4,7 @@ import { basename, dirname, join } from '$std/path/mod.ts'
 import type { DB } from 'sqlite'
 import { ImagePath, formats, processImage } from '../../ImagePath.ts'
 import type { Image } from '../../db.ts'
+import { getSettings } from '../../db.ts'
 import { getTime, redirect } from '../../utils.ts'
 import type { State } from '../_middleware.ts'
 import { authorizeAlbumOwner, authorizeImageOwner } from './_common.ts'
@@ -77,13 +78,19 @@ async function saveImage(db: DB, imageFile: File, albumId: number) {
   const { width, height, image } = await processImage(
     await imageFile.arrayBuffer()
   )
-  const jobs = [
-    image(imagePath.raw),
-    image(imagePath.thumbnail(), { isThumbnail: true }),
-    ...formats.map((format) =>
-      image(imagePath.thumbnail(format), { format, isThumbnail: true })
-    ),
-  ]
+  const { formatPreprocess, thumbnailPreprocess } = getSettings(db)
+  const formatJobs =
+    formatPreprocess === 'enable'
+      ? formats.map((format) => image(imagePath.converted(format), { format }))
+      : []
+  const thumbnailJobs =
+    thumbnailPreprocess === 'enable'
+      ? [...formats, null].map((format) =>
+          image(imagePath.thumbnail(format), { format, isThumbnail: true })
+        )
+      : []
+
+  const jobs = [image(imagePath.raw), ...formatJobs, ...thumbnailJobs]
   const results = await Promise.all(jobs)
 
   db.transaction(() => {
