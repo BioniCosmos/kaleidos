@@ -2,10 +2,11 @@ import type { Handlers } from '$fresh/server.ts'
 import { ensureDirSync, existsSync } from '$std/fs/mod.ts'
 import { basename, dirname, join } from '$std/path/mod.ts'
 import type { DB } from 'sqlite'
-import { ImagePath, formats, processImage } from '../../ImagePath.ts'
-import type { Image } from '../../db.ts'
-import { getSettings } from '../../db.ts'
+import { ImagePath, formats } from '../../ImagePath.ts'
+import { getSettings, type Image } from '../../db.ts'
+import { processImages } from '../../process-image.ts'
 import { getTime, redirect } from '../../utils.ts'
+import type { OutMessage } from '../../workers/image.ts'
 import type { State } from '../_middleware.ts'
 import { authorizeAlbumOwner, authorizeImageOwner } from './_common.ts'
 
@@ -15,10 +16,17 @@ export const handler: Handlers<unknown, State> = {
     const imageFiles = formData.getAll('imageFile') as File[]
     const { db } = ctx.state
     const albumId = Number(formData.get('albumId') as string)
-    const jobs = imageFiles.map((imageFile) =>
-      saveImage(db, imageFile, albumId)
+
+    const prepared = await Promise.all(
+      imageFiles.map((imageFile) => prepareSaveImage(db, imageFile, albumId))
     )
-    await Promise.all(jobs)
+
+    const inMessages = prepared.map(({ processParams }) => processParams)
+    const outMessages = await processImages(inMessages)
+
+    prepared.forEach(({ save }, i) => {
+      save(outMessages[i])
+    })
 
     const [[total]] = db.query<[number]>(
       'SELECT count(*) FROM images WHERE albumId = :albumId',
@@ -65,7 +73,7 @@ export const handler: Handlers<unknown, State> = {
   },
 }
 
-async function saveImage(db: DB, imageFile: File, albumId: number) {
+async function prepareSaveImage(db: DB, imageFile: File, albumId: number) {
   const time = getTime()
   const imagePath = await ImagePath.from(imageFile, time)
 
@@ -75,65 +83,74 @@ async function saveImage(db: DB, imageFile: File, albumId: number) {
   const path = imagePath.toString()
   const size = imageFile.size
 
-  const { width, height, image } = await processImage(
-    await imageFile.arrayBuffer()
-  )
+  const input = await imageFile.arrayBuffer()
+
   const { formatPreprocess, thumbnailPreprocess } = getSettings(db)
-  const formatJobs =
+  const formatVariants =
     formatPreprocess === 'enable'
-      ? formats.map((format) => image(imagePath.converted(format), { format }))
+      ? formats.map((format) => ({
+          output: imagePath.converted(format),
+          options: { format },
+        }))
       : []
-  const thumbnailJobs =
+  const thumbnailVariants =
     thumbnailPreprocess === 'enable'
-      ? [...formats, null].map((format) =>
-          image(imagePath.thumbnail(format), { format, isThumbnail: true })
-        )
+      ? [...formats, null].map((format) => ({
+          output: imagePath.thumbnail(format),
+          options: { format, isThumbnail: true },
+        }))
       : []
+  const variants = [
+    { output: imagePath.raw },
+    ...formatVariants,
+    ...thumbnailVariants,
+  ]
 
-  const jobs = [image(imagePath.raw), ...formatJobs, ...thumbnailJobs]
-  const results = await Promise.all(jobs)
+  const save = ({ width, height, variants }: OutMessage) => {
+    db.transaction(() => {
+      const records = Array.of<string>()
+      try {
+        db.queryEntries(
+          `
+        INSERT INTO images VALUES (
+          NULL,
+          :name,
+          :ext,
+          :date,
+          :albumId,
+          :path,
+          :size,
+          :width,
+          :height
+        )
+        `,
+          {
+            name,
+            ext,
+            date,
+            albumId,
+            path,
+            size,
+            width,
+            height,
+          } satisfies Omit<Image, 'id'>
+        )
 
-  db.transaction(() => {
-    const records = Array.of<string>()
-    try {
-      db.queryEntries(
-        `
-      INSERT INTO images VALUES (
-        NULL,
-        :name,
-        :ext,
-        :date,
-        :albumId,
-        :path,
-        :size,
-        :width,
-        :height
-      )
-      `,
-        {
-          name,
-          ext,
-          date,
-          albumId,
-          path,
-          size,
-          width,
-          height,
-        } satisfies Omit<Image, 'id'>
-      )
+        variants.forEach(({ file, tmpFile }) => {
+          ensureDirSync(dirname(file))
+          Deno.copyFileSync(tmpFile, file)
+          records.push(file)
+        })
+      } catch (error) {
+        records.forEach((record) => Deno.removeSync(record))
+        throw error
+      } finally {
+        variants.forEach(({ tmpFile }) => Deno.remove(tmpFile))
+      }
+    })
+  }
 
-      results.forEach(({ file, tmpFile }) => {
-        ensureDirSync(dirname(file))
-        Deno.copyFileSync(tmpFile, file)
-        records.push(file)
-      })
-    } catch (error) {
-      records.forEach((record) => Deno.removeSync(record))
-      throw error
-    } finally {
-      results.forEach(({ tmpFile }) => Deno.remove(tmpFile))
-    }
-  })
+  return { processParams: { input, variants }, save }
 }
 
 export function deleteImage(db: DB, id: number) {

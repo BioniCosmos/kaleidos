@@ -1,7 +1,8 @@
 import { join } from '$std/path/mod.ts'
 import { DB } from 'sqlite'
-import { ImagePath, processImage } from './ImagePath.ts'
+import { ImagePath } from './ImagePath.ts'
 import config from './config.ts'
+import { getMetadata } from './process-image.ts'
 
 const db = new DB(join(config.workingDir, 'kaleidos.db'))
 
@@ -19,7 +20,7 @@ type LegacyImage = {
 const legacyImages = db.queryEntries<LegacyImage>('SELECT * FROM images')
 const jobs = legacyImages.map(async (image) => {
   const imagePath = new ImagePath(image.path)
-  const { width, height } = await processImage(imagePath.raw)
+  const { width, height } = await getMetadata(imagePath.raw)
   const { userId: _userId, ...newImage } = image
   return { ...newImage, width, height }
 })

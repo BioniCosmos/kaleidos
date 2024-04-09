@@ -1,14 +1,15 @@
 import { type Handlers, type RouteConfig } from '$fresh/server.ts'
-import { ensureDir, exists } from '$std/fs/mod.ts'
+import { exists } from '$std/fs/mod.ts'
 import { contentType } from '$std/media_types/mod.ts'
-import { dirname } from '$std/path/mod.ts'
-import { ImagePath, formats, processImage, type Format } from '../ImagePath.ts'
+import { ImagePath, formats, type Format } from '../ImagePath.ts'
+import { processImage } from '../process-image.ts'
+import type { State } from './_middleware.ts'
 
 export const config: RouteConfig = {
   routeOverride: '/images/:year/:month/:day/:name',
 }
 
-export const handler: Handlers = {
+export const handler: Handlers<unknown, State> = {
   async GET(req, ctx) {
     const path = decodeURIComponent(Object.values(ctx.params).join('/'))
     const imagePath = new ImagePath(path)
@@ -36,10 +37,7 @@ export const handler: Handlers = {
     }
 
     if ((needConvert || isThumbnail) && !(await exists(actualPath))) {
-      const { image } = await processImage(imagePath.raw)
-      const { file, tmpFile } = await image(actualPath, { format, isThumbnail })
-      await ensureDir(dirname(file))
-      await Deno.rename(tmpFile, file)
+      await processImage(imagePath.raw, actualPath, { format, isThumbnail })
     }
 
     const imageFile = await Deno.readFile(actualPath)
