@@ -56,6 +56,15 @@ addEventListener('message', async (event) => {
 
     return { width, height, variants: await Promise.all(outVariants) }
   })
-  postMessage(await Promise.all(outMessages))
+
+  const counter = { total: outMessages.length, completed: 0 }
+  const withCounter = outMessages.map(async (message) => {
+    await message
+    counter.completed++
+    postMessage(counter)
+    return message
+  })
+  postMessage(await Promise.all(withCounter))
+
   close()
 })

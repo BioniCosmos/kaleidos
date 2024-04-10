@@ -1,5 +1,5 @@
 import type { JSX } from 'preact'
-import { useRef, useState } from 'preact/hooks'
+import { useEffect, useRef, useState } from 'preact/hooks'
 import Dialog from '../components/Dialog.tsx'
 import Icon from '../components/Icon.tsx'
 
@@ -25,13 +25,45 @@ export default function UploadImage({ albumId }: { albumId: number }) {
     inputRef.current!.value = ''
   }
 
-  interface Progress {
+  interface TransferProgress {
     loaded: number
     total: number
   }
-  const [progress, setProgress] = useState<Progress | null>(null)
-  const getProgress = ({ loaded, total }: Progress, round = false) => {
-    const percent = (loaded / total) * 100
+  const [transferProgress, setTransferProgress] =
+    useState<TransferProgress | null>(null)
+
+  interface ProcessProgress {
+    completed: number
+    total: number
+  }
+  const [processProgress, setProcessProgress] =
+    useState<ProcessProgress | null>(null)
+
+  useEffect(() => {
+    if (!open) {
+      return
+    }
+
+    const eventSource = new EventSource('/image/progress')
+    const handler = (event: MessageEvent) => {
+      setProcessProgress(JSON.parse(event.data))
+    }
+    eventSource.addEventListener('message', handler)
+    return () => {
+      eventSource.close()
+      eventSource.removeEventListener('message', handler)
+    }
+  }, [open])
+
+  const getProgress = (round = false) => {
+    const { loaded: transferLoaded, total: transferTotal } =
+      transferProgress ?? { loaded: 0, total: 1 }
+    const { completed: processCompleted, total: processTotal } =
+      processProgress ?? { completed: 0, total: 1 }
+
+    const percent =
+      (transferLoaded / transferTotal) * 50 +
+      (processCompleted / processTotal) * 50
     return `${round ? Math.round(percent) : percent}%`
   }
 
@@ -41,7 +73,7 @@ export default function UploadImage({ albumId }: { albumId: number }) {
       const formData = new FormData(formRef.current!)
 
       xhrRef.current.upload.addEventListener('progress', ({ loaded, total }) =>
-        setProgress({ loaded, total })
+        setTransferProgress({ loaded, total })
       )
 
       xhrRef.current.addEventListener('loadend', () => {
@@ -90,13 +122,13 @@ export default function UploadImage({ albumId }: { albumId: number }) {
             <img src={image} class="size-28 object-cover rounded" />
           ))}
         </div>
-        {progress !== null && (
+        {transferProgress !== null && (
           <div class="w-full bg-gray-200 rounded-full dark:bg-gray-700">
             <div
               class="bg-blue-600 text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-full"
-              style={{ width: getProgress(progress) }}
+              style={{ width: getProgress() }}
             >
-              {getProgress(progress, true)}
+              {getProgress(true)}
             </div>
           </div>
         )}

@@ -24,9 +24,7 @@ export const handler: Handlers<unknown, State> = {
     const inMessages = prepared.map(({ processParams }) => processParams)
     const outMessages = await processImages(inMessages)
 
-    prepared.forEach(({ save }, i) => {
-      save(outMessages[i])
-    })
+    prepared.forEach(({ save }, i) => save(outMessages[i]))
 
     const [[total]] = db.query<[number]>(
       'SELECT count(*) FROM images WHERE albumId = :albumId',
