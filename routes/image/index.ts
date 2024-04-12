@@ -2,9 +2,13 @@ import type { Handlers } from '$fresh/server.ts'
 import { ensureDirSync, existsSync } from '$std/fs/mod.ts'
 import { basename, dirname, join } from '$std/path/mod.ts'
 import type { DB } from 'sqlite'
-import { ImagePath, formats } from '../../ImagePath.ts'
+import { ImagePath } from '../../ImagePath.ts'
 import { getSettings, type Image } from '../../db.ts'
-import { processImages } from '../../process-image.ts'
+import {
+  prepareFormatVariants,
+  prepareThumbnailVariants,
+  processImages,
+} from '../../process-image.ts'
 import { getTime, redirect } from '../../utils.ts'
 import type { OutMessage } from '../../workers/image.ts'
 import type { State } from '../_middleware.ts'
@@ -85,19 +89,9 @@ async function prepareSaveImage(db: DB, imageFile: File, albumId: number) {
 
   const { formatPreprocess, thumbnailPreprocess } = getSettings(db)
   const formatVariants =
-    formatPreprocess === 'enable'
-      ? formats.map((format) => ({
-          output: imagePath.converted(format),
-          options: { format },
-        }))
-      : []
+    formatPreprocess === 'enable' ? prepareFormatVariants(imagePath) : []
   const thumbnailVariants =
-    thumbnailPreprocess === 'enable'
-      ? [...formats, null].map((format) => ({
-          output: imagePath.thumbnail(format),
-          options: { format, isThumbnail: true },
-        }))
-      : []
+    thumbnailPreprocess === 'enable' ? prepareThumbnailVariants(imagePath) : []
   const variants = [
     { output: imagePath.raw },
     ...formatVariants,

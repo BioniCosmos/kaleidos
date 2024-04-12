@@ -16,6 +16,7 @@ import * as $index from "./routes/index.tsx";
 import * as $login from "./routes/login.tsx";
 import * as $logout from "./routes/logout.ts";
 import * as $settings_admin from "./routes/settings/admin.ts";
+import * as $settings_convert from "./routes/settings/convert.ts";
 import * as $settings_index from "./routes/settings/index.tsx";
 import * as $settings_password from "./routes/settings/password.ts";
 import * as $settings_profile from "./routes/settings/profile.ts";
@@ -47,6 +48,7 @@ const manifest = {
     "./routes/login.tsx": $login,
     "./routes/logout.ts": $logout,
     "./routes/settings/admin.ts": $settings_admin,
+    "./routes/settings/convert.ts": $settings_convert,
     "./routes/settings/index.tsx": $settings_index,
     "./routes/settings/password.ts": $settings_password,
     "./routes/settings/profile.ts": $settings_profile,

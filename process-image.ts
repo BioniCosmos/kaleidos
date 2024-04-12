@@ -1,6 +1,7 @@
 import { ensureFile } from '$std/fs/mod.ts'
 import sharp, { type Metadata } from 'sharp'
 import type { Format } from './ImagePath.ts'
+import { ImagePath, formats } from './ImagePath.ts'
 import type { InMessage, OutMessage } from './workers/image.ts'
 
 export type SharpInput =
@@ -79,4 +80,26 @@ export function getNormalSize({ width, height, orientation }: Metadata) {
   return (orientation ?? 0) >= 5
     ? { width: height, height: width }
     : { width, height }
+}
+
+export function prepareFormatVariants(pathOrImagePath: string | ImagePath) {
+  const imagePath =
+    typeof pathOrImagePath === 'string'
+      ? new ImagePath(pathOrImagePath)
+      : pathOrImagePath
+  return formats.map((format) => ({
+    output: imagePath.converted(format),
+    options: { format },
+  }))
+}
+
+export function prepareThumbnailVariants(pathOrImagePath: string | ImagePath) {
+  const imagePath =
+    typeof pathOrImagePath === 'string'
+      ? new ImagePath(pathOrImagePath)
+      : pathOrImagePath
+  return [...formats, null].map((format) => ({
+    output: imagePath.thumbnail(format),
+    options: { format, isThumbnail: true },
+  }))
 }

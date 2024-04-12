@@ -33,9 +33,20 @@ export default function AdminSettings({ db }: { db: DB }) {
     />
   ))
   return (
-    <Form method="post" action="/settings/admin">
-      {settingItems}
-      <Button>Save changes</Button>
-    </Form>
+    <>
+      <Form method="post" action="/settings/admin">
+        {settingItems}
+        <Button>Save changes</Button>
+      </Form>
+      <hr />
+      <Form action="/settings/convert">
+        <Button name="operation" value="format">
+          Generate images of other formats
+        </Button>
+        <Button name="operation" value="thumbnail">
+          Generate all thumbnails
+        </Button>
+      </Form>
+    </>
   )
 }
