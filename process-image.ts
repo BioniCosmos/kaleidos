@@ -25,15 +25,19 @@ export function processImages(inMessage: InMessage[]) {
   })
   worker.postMessage(inMessage)
   return new Promise<OutMessage[]>((resolve) => {
-    worker.addEventListener('message', (event) => {
+    const handler = (
+      event: MessageEvent<OutMessage[] | { total: number; completed: number }>
+    ) => {
       const message = event.data
       if ('total' in message) {
         const event = new CustomEvent('progress', { detail: message })
         dispatchEvent(event)
       } else {
-        resolve(event.data)
+        resolve(message)
+        worker.removeEventListener('message', handler)
       }
-    })
+    }
+    worker.addEventListener('message', handler)
   })
 }
 

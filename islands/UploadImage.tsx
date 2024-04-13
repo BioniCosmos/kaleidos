@@ -72,15 +72,21 @@ export default function UploadImage({ albumId }: { albumId: number }) {
       xhrRef.current = new XMLHttpRequest()
       const formData = new FormData(formRef.current!)
 
-      xhrRef.current.upload.addEventListener('progress', ({ loaded, total }) =>
+      const progressHandler = ({
+        loaded,
+        total,
+      }: ProgressEvent<XMLHttpRequestEventTarget>) =>
         setTransferProgress({ loaded, total })
-      )
+      xhrRef.current.upload.addEventListener('progress', progressHandler)
 
-      xhrRef.current.addEventListener('loadend', () => {
+      const loadEndHandler = () => {
+        xhrRef.current?.upload.removeEventListener('progress', progressHandler)
         if (xhrRef.current?.status === 200) {
           location.assign(xhrRef.current.responseURL)
         }
-      })
+        xhrRef.current?.removeEventListener('loadend', loadEndHandler)
+      }
+      xhrRef.current.addEventListener('loadend', loadEndHandler)
 
       xhrRef.current.open('POST', '/image')
       xhrRef.current.send(formData)
