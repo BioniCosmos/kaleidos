@@ -1,5 +1,5 @@
 import type { JSX } from 'preact'
-import { useEffect, useRef, useState } from 'preact/hooks'
+import { useRef, useState } from 'preact/hooks'
 import Dialog from '../components/Dialog.tsx'
 import Icon from '../components/Icon.tsx'
 
@@ -9,6 +9,8 @@ export default function UploadImage({ albumId }: { albumId: number }) {
   const inputRef = useRef<HTMLInputElement>(null)
   const formRef = useRef<HTMLFormElement>(null)
   const xhrRef = useRef<XMLHttpRequest | null>(null)
+  const eventSourceRef = useRef<EventSource>()
+  const messageHandlerRef = useRef<(event: MessageEvent) => void>()
 
   function preview(event: JSX.TargetedEvent<HTMLInputElement>) {
     const files = event.currentTarget.files
@@ -23,6 +25,13 @@ export default function UploadImage({ albumId }: { albumId: number }) {
   function clean() {
     images.forEach((image) => URL.revokeObjectURL(image))
     inputRef.current!.value = ''
+    setTransferProgress(null)
+    setProcessProgress(null)
+    eventSourceRef.current?.close()
+    eventSourceRef.current?.removeEventListener(
+      'message',
+      messageHandlerRef.current!
+    )
   }
 
   interface TransferProgress {
@@ -31,6 +40,9 @@ export default function UploadImage({ albumId }: { albumId: number }) {
   }
   const [transferProgress, setTransferProgress] =
     useState<TransferProgress | null>(null)
+  const cancelDisabled =
+    transferProgress !== null &&
+    transferProgress.loaded === transferProgress.total
 
   interface ProcessProgress {
     completed: number
@@ -38,22 +50,6 @@ export default function UploadImage({ albumId }: { albumId: number }) {
   }
   const [processProgress, setProcessProgress] =
     useState<ProcessProgress | null>(null)
-
-  useEffect(() => {
-    if (!open) {
-      return
-    }
-
-    const eventSource = new EventSource('/image/progress')
-    const handler = (event: MessageEvent) => {
-      setProcessProgress(JSON.parse(event.data))
-    }
-    eventSource.addEventListener('message', handler)
-    return () => {
-      eventSource.close()
-      eventSource.removeEventListener('message', handler)
-    }
-  }, [open])
 
   const getProgress = (round = false) => {
     const { loaded: transferLoaded, total: transferTotal } =
@@ -87,6 +83,14 @@ export default function UploadImage({ albumId }: { albumId: number }) {
         xhrRef.current?.removeEventListener('loadend', loadEndHandler)
       }
       xhrRef.current.addEventListener('loadend', loadEndHandler)
+
+      eventSourceRef.current = new EventSource('/image/progress')
+      messageHandlerRef.current = (event: MessageEvent) =>
+        setProcessProgress(JSON.parse(event.data))
+      eventSourceRef.current.addEventListener(
+        'message',
+        messageHandlerRef.current
+      )
 
       xhrRef.current.open('POST', '/image')
       xhrRef.current.send(formData)
@@ -122,6 +126,7 @@ export default function UploadImage({ albumId }: { albumId: number }) {
         cleanup={clean}
         onClickConfirm={submit}
         onClickCancel={() => xhrRef.current?.abort()}
+        cancelDisabled={cancelDisabled}
       >
         <div class="flex flex-wrap justify-center gap-4">
           {images.map((image) => (

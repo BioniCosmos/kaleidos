@@ -8,6 +8,7 @@ interface Props extends JSX.HTMLAttributes<HTMLDialogElement> {
   onClickConfirm: () => void | Promise<void> | false
   onClickCancel?: () => void
   cleanup?: () => void
+  cancelDisabled?: boolean
 }
 
 export default function Dialog({
@@ -18,6 +19,7 @@ export default function Dialog({
   cleanup,
   onClickConfirm,
   onClickCancel,
+  cancelDisabled = false,
 }: Props) {
   const dialogRef = useRef<HTMLDialogElement>(null)
   const [isWorking, setIsWorking] = useState(false)
@@ -66,7 +68,7 @@ export default function Dialog({
             handleClose((event.submitter as HTMLButtonElement).value)
           }}
         >
-          <Button color="red" value="close">
+          <Button color="red" value="close" disabled={cancelDisabled}>
             Cancel
           </Button>
           <Button value="confirm" disabled={isWorking}>
