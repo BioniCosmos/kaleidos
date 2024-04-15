@@ -12,6 +12,7 @@ import {
 } from '../../process-image.ts'
 import { redirect } from '../../utils.ts'
 import type { State } from '../_middleware.ts'
+import { UploadEvent } from '../image/_common.ts'
 
 export const handler: Handlers<unknown, State> = {
   async GET(_req, ctx) {
@@ -25,8 +26,9 @@ export const handler: Handlers<unknown, State> = {
       return redirect('/error?message=Unsupported operation')
     }
 
+    const { uploadEvent } = UploadEvent.of()
     const inMessages = await getLackVariants(db, operation)
-    const outMessages = await processImages(inMessages)
+    const outMessages = await processImages(inMessages, uploadEvent)
     const jobs = outMessages
       .flatMap(({ variants }) => variants)
       .map(({ tmpFile, file }) =>

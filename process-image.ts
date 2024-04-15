@@ -1,8 +1,16 @@
 import { ensureFile } from '$std/fs/mod.ts'
 import sharp, { type Metadata } from 'sharp'
+import type { DB } from 'sqlite'
 import type { Format } from './ImagePath.ts'
 import { ImagePath, formats } from './ImagePath.ts'
-import type { InMessage, OutMessage } from './workers/image.ts'
+import { getSettings } from './db.ts'
+import type { UploadEvent } from './routes/image/_common.ts'
+import { getTime } from './utils.ts'
+import type {
+  InMessage as ProcessIn,
+  OutMessage as ProcessOut,
+} from './workers/process-images.ts'
+import type { InMessage as SaveIn } from './workers/save-images.ts'
 
 export type SharpInput =
   | ArrayBuffer
@@ -19,19 +27,22 @@ export type SharpInput =
 
 export type ImageOptions = { format?: Format | null; isThumbnail?: boolean }
 
-export function processImages(inMessage: InMessage[]) {
-  const worker = new Worker(import.meta.resolve('./workers/image.ts'), {
-    type: 'module',
-  })
+export function processImages(
+  inMessage: ProcessIn[],
+  uploadEvent: UploadEvent
+) {
+  const worker = new Worker(
+    import.meta.resolve('./workers/process-images.ts'),
+    { type: 'module' }
+  )
   worker.postMessage(inMessage)
-  return new Promise<OutMessage[]>((resolve) => {
+  return new Promise<ProcessOut[]>((resolve) => {
     const handler = (
-      event: MessageEvent<OutMessage[] | { total: number; completed: number }>
+      event: MessageEvent<ProcessOut[] | { total: number; completed: number }>
     ) => {
       const message = event.data
       if ('total' in message) {
-        const event = new CustomEvent('progress', { detail: message })
-        dispatchEvent(event)
+        uploadEvent.dispatchEvent('progress', message)
       } else {
         resolve(message)
         worker.removeEventListener('message', handler)
@@ -106,4 +117,65 @@ export function prepareThumbnailVariants(pathOrImagePath: string | ImagePath) {
     output: imagePath.thumbnail(format),
     options: { format, isThumbnail: true },
   }))
+}
+
+export async function uploadImages(
+  db: DB,
+  imageFiles: File[],
+  albumId: number,
+  uploadEvent: UploadEvent
+) {
+  const { process, save } = await Promise.all(
+    imageFiles.map((imageFile) => prepareUploadImage(db, imageFile))
+  ).then((prepared) => ({
+    process: prepared.map((process) => process.processParams),
+    save: prepared.map((process) => process.saveParams),
+  }))
+  const processOuts = await processImages(process, uploadEvent)
+
+  const saveIn: SaveIn = {
+    albumId,
+    images: save.map((saveParams, i) => {
+      const { width, height, variants } = processOuts[i]
+      return { metadata: { ...saveParams, width, height }, variants }
+    }),
+  }
+  const worker = new Worker(import.meta.resolve('./workers/save-images.ts'), {
+    type: 'module',
+  })
+  worker.postMessage(saveIn)
+  worker.addEventListener(
+    'message',
+    (event) => uploadEvent.dispatchEvent('redirect', event.data),
+    { once: true }
+  )
+}
+
+async function prepareUploadImage(db: DB, imageFile: File) {
+  const time = getTime()
+  const imagePath = await ImagePath.from(imageFile, time)
+
+  const name = imagePath.originalName
+  const ext = imagePath.ext
+  const date = time.time
+  const path = imagePath.toString()
+  const size = imageFile.size
+
+  const input = await imageFile.arrayBuffer()
+
+  const { formatPreprocess, thumbnailPreprocess } = getSettings(db)
+  const formatVariants =
+    formatPreprocess === 'enable' ? prepareFormatVariants(imagePath) : []
+  const thumbnailVariants =
+    thumbnailPreprocess === 'enable' ? prepareThumbnailVariants(imagePath) : []
+  const variants = [
+    { output: imagePath.raw },
+    ...formatVariants,
+    ...thumbnailVariants,
+  ]
+
+  return {
+    processParams: { input, variants },
+    saveParams: { name, ext, date, path, size },
+  }
 }

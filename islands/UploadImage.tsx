@@ -9,8 +9,6 @@ export default function UploadImage({ albumId }: { albumId: number }) {
   const inputRef = useRef<HTMLInputElement>(null)
   const formRef = useRef<HTMLFormElement>(null)
   const xhrRef = useRef<XMLHttpRequest | null>(null)
-  const eventSourceRef = useRef<EventSource>()
-  const messageHandlerRef = useRef<(event: MessageEvent) => void>()
 
   function preview(event: JSX.TargetedEvent<HTMLInputElement>) {
     const files = event.currentTarget.files
@@ -27,11 +25,6 @@ export default function UploadImage({ albumId }: { albumId: number }) {
     inputRef.current!.value = ''
     setTransferProgress(null)
     setProcessProgress(null)
-    eventSourceRef.current?.close()
-    eventSourceRef.current?.removeEventListener(
-      'message',
-      messageHandlerRef.current!
-    )
   }
 
   interface TransferProgress {
@@ -77,20 +70,21 @@ export default function UploadImage({ albumId }: { albumId: number }) {
 
       const loadEndHandler = () => {
         xhrRef.current?.upload.removeEventListener('progress', progressHandler)
-        if (xhrRef.current?.status === 200) {
-          location.assign(xhrRef.current.responseURL)
+        if (xhrRef.current?.status === 202) {
+          const id = xhrRef.current.responseText
+          const es = new EventSource(`/image/progress/${id}`)
+          es.addEventListener('progress', ({ data }) => {
+            setProcessProgress(JSON.parse(data))
+          })
+          es.addEventListener('redirect', ({ data }) => {
+            const { lastPage } = JSON.parse(data)
+            es.close()
+            location.replace(`/album/${albumId}?page=${lastPage}`)
+          })
         }
         xhrRef.current?.removeEventListener('loadend', loadEndHandler)
       }
       xhrRef.current.addEventListener('loadend', loadEndHandler)
-
-      eventSourceRef.current = new EventSource('/image/progress')
-      messageHandlerRef.current = (event: MessageEvent) =>
-        setProcessProgress(JSON.parse(event.data))
-      eventSourceRef.current.addEventListener(
-        'message',
-        messageHandlerRef.current
-      )
 
       xhrRef.current.open('POST', '/image')
       xhrRef.current.send(formData)
