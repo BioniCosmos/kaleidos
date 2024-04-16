@@ -1,6 +1,8 @@
 import type { Handlers } from '$fresh/server.ts'
-import type { UploadEventMapKey } from '../_common.ts'
-import { UploadEvent } from '../_common.ts'
+import {
+  UploadEvent,
+  type UploadEventMapKey,
+} from '../../../lib/UploadEvent.ts'
 
 export const handler: Handlers = {
   GET(_req, ctx) {

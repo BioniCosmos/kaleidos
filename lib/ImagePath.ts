@@ -1,6 +1,6 @@
 import { exists } from '$std/fs/mod.ts'
 import { join, parse, type ParsedPath } from '$std/path/mod.ts'
-import config from './config.ts'
+import config from '../config.ts'
 import type { Timestamp } from './utils.ts'
 import { randomId } from './utils.ts'
 

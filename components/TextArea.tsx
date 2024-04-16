@@ -1,7 +1,7 @@
 import { clsx } from 'clsx'
 import type { JSX } from 'preact'
 import { useRef } from 'preact/hooks'
-import { useId } from '../utils.ts'
+import { useId } from '../lib/utils.ts'
 
 interface Props extends JSX.HTMLAttributes<HTMLTextAreaElement> {
   label: string

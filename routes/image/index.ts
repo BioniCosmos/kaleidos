@@ -2,16 +2,16 @@ import type { Handlers } from '$fresh/server.ts'
 import { existsSync } from '$std/fs/mod.ts'
 import { basename, join } from '$std/path/mod.ts'
 import type { DB } from 'sqlite'
-import { ImagePath } from '../../ImagePath.ts'
-import { type Image } from '../../db.ts'
-import { uploadImages } from '../../process-image.ts'
-import { redirect } from '../../utils.ts'
-import type { State } from '../_middleware.ts'
+import { ImagePath } from '../../lib/ImagePath.ts'
+import { UploadEvent } from '../../lib/UploadEvent.ts'
 import {
-  UploadEvent,
   authorizeAlbumOwner,
   authorizeImageOwner,
-} from './_common.ts'
+  type Image,
+} from '../../lib/db.ts'
+import { uploadImages } from '../../lib/process-image.ts'
+import { redirect } from '../../lib/utils.ts'
+import type { State } from '../_middleware.ts'
 
 export const handler: Handlers<unknown, State> = {
   async POST(req, ctx) {

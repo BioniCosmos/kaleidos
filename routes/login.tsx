@@ -4,8 +4,8 @@ import Button from '../components/Button.tsx'
 import Form from '../components/Form.tsx'
 import Input from '../components/Input.tsx'
 import Title from '../components/Title.tsx'
-import { type User } from '../db.ts'
-import { jwtSign, redirect } from '../utils.ts'
+import { type User } from '../lib/db.ts'
+import { jwtSign, redirect } from '../lib/utils.ts'
 import type { State } from './_middleware.ts'
 
 export const handler: Handlers<unknown, State> = {
@@ -40,7 +40,10 @@ export default function Login() {
   return (
     <>
       <Title>Login</Title>
-      <Form method="post" class="bg-white p-8 rounded shadow dark:bg-zinc-950 dark:border-zinc-800 dark:border">
+      <Form
+        method="post"
+        class="bg-white p-8 rounded shadow dark:bg-zinc-950 dark:border-zinc-800 dark:border"
+      >
         <Input label="Id" name="id" required />
         <Input label="Password" type="password" name="password" required />
         <Button>Login</Button>

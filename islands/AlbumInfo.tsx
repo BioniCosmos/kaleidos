@@ -3,8 +3,8 @@ import Dialog from '../components/Dialog.tsx'
 import Form from '../components/Form.tsx'
 import InfoButton from '../components/InfoButton.tsx'
 import Input from '../components/Input.tsx'
-import type { Album } from '../db.ts'
-import { sendJSON } from '../utils.ts'
+import type { Album } from '../lib/db.ts'
+import { sendJSON } from '../lib/utils.ts'
 
 export default function AlbumInfo({
   album,

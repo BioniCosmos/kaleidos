@@ -3,7 +3,7 @@ import {
   getNormalSize,
   type ImageOptions,
   type SharpInput,
-} from '../process-image.ts'
+} from '../lib/process-image.ts'
 
 export interface InMessage {
   input: SharpInput

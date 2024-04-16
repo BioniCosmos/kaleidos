@@ -5,7 +5,7 @@ import FloatingMenu from '../components/FloatingMenu.tsx'
 import Grid from '../components/Grid.tsx'
 import SelectAllButton from '../components/SelectAllButton.tsx'
 import SelectionCount from '../components/SelectionCount.tsx'
-import type { Album } from '../db.ts'
+import type { Album } from '../lib/db.ts'
 import DeleteSelection from './DeleteSelection.tsx'
 import NewAlbum from './NewAlbum.tsx'
 

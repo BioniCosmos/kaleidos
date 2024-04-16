@@ -1,8 +1,8 @@
 import { join } from '$std/path/mod.ts'
 import { DB } from 'sqlite'
-import { ImagePath } from './ImagePath.ts'
 import config from './config.ts'
-import { getMetadata } from './process-image.ts'
+import { ImagePath } from './lib/ImagePath.ts'
+import { getMetadata } from './lib/process-image.ts'
 
 const db = new DB(join(config.workingDir, 'kaleidos.db'))
 

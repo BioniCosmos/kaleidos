@@ -2,14 +2,14 @@ import type { FreshContext } from '$fresh/server.ts'
 import { join } from '$std/path/mod.ts'
 import { DB } from 'sqlite'
 import config from '../config.ts'
-import type { User } from '../db.ts'
+import type { User } from '../lib/db.ts'
 import {
   createAlbumTable,
   createImageTable,
   createSettingTable,
   createUserTable,
-} from '../db.ts'
-import { redirect, verifyToken } from '../utils.ts'
+} from '../lib/db.ts'
+import { redirect, verifyToken } from '../lib/utils.ts'
 
 export async function handler(req: Request, ctx: FreshContext<State>) {
   if (

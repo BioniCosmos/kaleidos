@@ -3,12 +3,18 @@ import { join } from '$std/path/mod.ts'
 import type { FeatherIconNames } from 'feather-icons'
 import Icon from '../../components/Icon.tsx'
 import Title from '../../components/Title.tsx'
-import { getAlbumOptions, type Album, type Image, type User } from '../../db.ts'
 import ImageInfo from '../../islands/ImageInfo.tsx'
 import ImageLink from '../../islands/ImageLink.tsx'
-import { redirect } from '../../utils.ts'
+import {
+  authorizeAlbumOwner,
+  authorizeImageOwner,
+  getAlbumOptions,
+  type Album,
+  type Image,
+  type User,
+} from '../../lib/db.ts'
+import { redirect } from '../../lib/utils.ts'
 import type { State } from '../_middleware.ts'
-import { authorizeAlbumOwner, authorizeImageOwner } from './_common.ts'
 
 export const handler: Handlers<unknown, State> = {
   async POST(req, ctx) {

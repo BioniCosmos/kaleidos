@@ -1,8 +1,8 @@
 import { type Handlers, type RouteConfig } from '$fresh/server.ts'
 import { exists } from '$std/fs/mod.ts'
 import { contentType } from '$std/media_types/mod.ts'
-import { ImagePath, formats, type Format } from '../ImagePath.ts'
-import { processImage } from '../process-image.ts'
+import { ImagePath, formats, type Format } from '../lib/ImagePath.ts'
+import { processImage } from '../lib/process-image.ts'
 import type { State } from './_middleware.ts'
 
 export const config: RouteConfig = {

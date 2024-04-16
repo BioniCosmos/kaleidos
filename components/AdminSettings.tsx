@@ -1,5 +1,5 @@
 import type { DB } from 'sqlite'
-import { getSettings } from '../db.ts'
+import { getSettings } from '../lib/db.ts'
 import Button from './Button.tsx'
 import Form from './Form.tsx'
 import SelectMenu from './SelectMenu.tsx'

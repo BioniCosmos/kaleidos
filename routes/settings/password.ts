@@ -1,6 +1,6 @@
 import type { Handlers } from '$fresh/server.ts'
 import { hash, verify } from 'argon2'
-import { redirect } from '../../utils.ts'
+import { redirect } from '../../lib/utils.ts'
 import type { State } from '../_middleware.ts'
 
 export const handler: Handlers<unknown, State> = {

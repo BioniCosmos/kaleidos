@@ -16,7 +16,7 @@ export function redirect(path: string) {
 let _secret: Uint8Array | undefined
 const secret = async () => {
   if (_secret === undefined) {
-    const config = (await import('./config.ts')).default
+    const config = (await import('../config.ts')).default
     _secret = new TextEncoder().encode(config.secret)
   }
   return _secret

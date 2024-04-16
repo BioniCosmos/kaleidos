@@ -1,10 +1,10 @@
 import { defineRoute, type Handlers } from '$fresh/server.ts'
 import Pagination from '../../components/Pagination.tsx'
 import Title from '../../components/Title.tsx'
-import { getAlbumOptions, type Album, type Image } from '../../db.ts'
 import AlbumInfo from '../../islands/AlbumInfo.tsx'
 import Images from '../../islands/Images.tsx'
-import { redirect } from '../../utils.ts'
+import { getAlbumOptions, type Album, type Image } from '../../lib/db.ts'
+import { redirect } from '../../lib/utils.ts'
 import type { State } from '../_middleware.ts'
 
 export const handler: Handlers<unknown, State> = {

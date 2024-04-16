@@ -2,7 +2,7 @@ import { ensureDirSync } from '$std/fs/mod.ts'
 import { dirname, join } from '$std/path/mod.ts'
 import { DB } from 'sqlite'
 import config from '../config.ts'
-import type { Image } from '../db.ts'
+import type { Image } from '../lib/db.ts'
 import type { OutMessage as ProcessImagesOutMessage } from './process-images.ts'
 
 export interface InMessage {

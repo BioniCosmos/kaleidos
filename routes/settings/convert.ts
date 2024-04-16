@@ -2,17 +2,17 @@ import type { Handlers } from '$fresh/server.ts'
 import { ensureDir, walk } from '$std/fs/mod.ts'
 import { dirname, join } from '$std/path/mod.ts'
 import type { DB } from 'sqlite'
-import { ImagePath } from '../../ImagePath.ts'
 import config from '../../config.ts'
-import type { Image } from '../../db.ts'
+import { ImagePath } from '../../lib/ImagePath.ts'
+import { UploadEvent } from '../../lib/UploadEvent.ts'
+import type { Image } from '../../lib/db.ts'
 import {
   prepareFormatVariants,
   prepareThumbnailVariants,
   processImages,
-} from '../../process-image.ts'
-import { redirect } from '../../utils.ts'
+} from '../../lib/process-image.ts'
+import { redirect } from '../../lib/utils.ts'
 import type { State } from '../_middleware.ts'
-import { UploadEvent } from '../image/_common.ts'
 
 export const handler: Handlers<unknown, State> = {
   async GET(_req, ctx) {

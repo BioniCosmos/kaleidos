@@ -1,7 +1,7 @@
 import { useState } from 'preact/hooks'
 import Dialog from '../components/Dialog.tsx'
 import FloatButton from '../components/FloatButton.tsx'
-import { sendJSON, setToArray } from '../utils.ts'
+import { sendJSON, setToArray } from '../lib/utils.ts'
 
 interface Props {
   target: 'image' | 'album'

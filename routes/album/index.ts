@@ -1,7 +1,7 @@
 import type { Handlers } from '$fresh/server.ts'
 import type { DB } from 'sqlite'
-import type { Album } from '../../db.ts'
-import { redirect } from '../../utils.ts'
+import type { Album } from '../../lib/db.ts'
+import { redirect } from '../../lib/utils.ts'
 import type { State } from '../_middleware.ts'
 import { deleteImage } from '../image/index.ts'
 

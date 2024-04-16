@@ -1,5 +1,5 @@
 import { useState } from 'preact/hooks'
-import { randomId } from '../utils.ts'
+import { randomId } from '../lib/utils.ts'
 import Icon from './Icon.tsx'
 
 export default function Toast({ toastIds }: { toastIds: string[] }) {

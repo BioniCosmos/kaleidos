@@ -4,9 +4,8 @@ import Button from '../components/Button.tsx'
 import Form from '../components/Form.tsx'
 import Input from '../components/Input.tsx'
 import Title from '../components/Title.tsx'
-import type { User } from '../db.ts'
-import { getSettings } from '../db.ts'
-import { redirect } from '../utils.ts'
+import { getSettings, type User } from '../lib/db.ts'
+import { redirect } from '../lib/utils.ts'
 import { State } from './_middleware.ts'
 
 export const handler: Handlers<unknown, State> = {

@@ -4,8 +4,8 @@ import Form from '../components/Form.tsx'
 import InfoButton from '../components/InfoButton.tsx'
 import Input from '../components/Input.tsx'
 import SelectMenu from '../components/SelectMenu.tsx'
-import type { Image } from '../db.ts'
-import { sendJSON } from '../utils.ts'
+import type { Image } from '../lib/db.ts'
+import { sendJSON } from '../lib/utils.ts'
 
 export default function ImageInfo({
   image,

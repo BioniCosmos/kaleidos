@@ -1,6 +1,6 @@
 import { type PageProps } from '$fresh/server.ts'
-import { type Album } from '../db.ts'
 import Albums from '../islands/Albums.tsx'
+import { type Album } from '../lib/db.ts'
 import type { State } from './_middleware.ts'
 
 export default function Index({ state }: PageProps<unknown, State>) {
