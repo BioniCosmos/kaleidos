@@ -2,6 +2,8 @@ import type { JSX } from 'preact'
 import { useRef, useState } from 'preact/hooks'
 import Dialog from '../components/Dialog.tsx'
 import Icon from '../components/Icon.tsx'
+import type { UploadEventMap } from '../lib/UploadEvent.ts'
+import { getProgress } from '../lib/utils.ts'
 
 export default function UploadImage({ albumId }: { albumId: number }) {
   const [open, setOpen] = useState(false)
@@ -27,34 +29,17 @@ export default function UploadImage({ albumId }: { albumId: number }) {
     setProcessProgress(null)
   }
 
-  interface TransferProgress {
-    loaded: number
-    total: number
-  }
-  const [transferProgress, setTransferProgress] =
-    useState<TransferProgress | null>(null)
+  const [transferProgress, setTransferProgress] = useState<Pick<
+    ProgressEvent,
+    'loaded' | 'total'
+  > | null>(null)
   const cancelDisabled =
     transferProgress !== null &&
     transferProgress.loaded === transferProgress.total
 
-  interface ProcessProgress {
-    completed: number
-    total: number
-  }
-  const [processProgress, setProcessProgress] =
-    useState<ProcessProgress | null>(null)
-
-  const getProgress = (round = false) => {
-    const { loaded: transferLoaded, total: transferTotal } =
-      transferProgress ?? { loaded: 0, total: 1 }
-    const { completed: processCompleted, total: processTotal } =
-      processProgress ?? { completed: 0, total: 1 }
-
-    const percent =
-      (transferLoaded / transferTotal) * 50 +
-      (processCompleted / processTotal) * 50
-    return `${round ? Math.round(percent) : percent}%`
-  }
+  const [processProgress, setProcessProgress] = useState<
+    UploadEventMap['progress'] | null
+  >(null)
 
   function submit() {
     return new Promise<void>(() => {
@@ -131,9 +116,9 @@ export default function UploadImage({ albumId }: { albumId: number }) {
           <div class="w-full bg-gray-200 rounded-full dark:bg-gray-700">
             <div
               class="bg-blue-600 text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-full"
-              style={{ width: getProgress() }}
+              style={{ width: getProgress(processProgress, transferProgress) }}
             >
-              {getProgress(true)}
+              {getProgress(processProgress, transferProgress, true)}
             </div>
           </div>
         )}

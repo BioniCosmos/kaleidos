@@ -24,6 +24,7 @@ import * as $signup from "./routes/signup.tsx";
 import * as $AlbumInfo from "./islands/AlbumInfo.tsx";
 import * as $Albums from "./islands/Albums.tsx";
 import * as $DeleteSelection from "./islands/DeleteSelection.tsx";
+import * as $GenerateVariants from "./islands/GenerateVariants.tsx";
 import * as $ImageInfo from "./islands/ImageInfo.tsx";
 import * as $ImageLink from "./islands/ImageLink.tsx";
 import * as $Images from "./islands/Images.tsx";
@@ -58,6 +59,7 @@ const manifest = {
     "./islands/AlbumInfo.tsx": $AlbumInfo,
     "./islands/Albums.tsx": $Albums,
     "./islands/DeleteSelection.tsx": $DeleteSelection,
+    "./islands/GenerateVariants.tsx": $GenerateVariants,
     "./islands/ImageInfo.tsx": $ImageInfo,
     "./islands/ImageLink.tsx": $ImageLink,
     "./islands/Images.tsx": $Images,

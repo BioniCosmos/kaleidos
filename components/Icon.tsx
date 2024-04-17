@@ -12,7 +12,12 @@ export default function Icon({
 }) {
   return (
     <div
-      dangerouslySetInnerHTML={{ __html: feather.icons[name].toSvg(options) }}
+      dangerouslySetInnerHTML={{
+        __html: feather.icons[name].toSvg({
+          ...options,
+          class: 'mx-auto' + (options?.class ?? ''),
+        }),
+      }}
     />
   )
 }

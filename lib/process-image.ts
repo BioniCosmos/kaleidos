@@ -8,7 +8,7 @@ import type {
 import type { InMessage as SaveIn } from '../workers/save-images.ts'
 import type { Format } from './ImagePath.ts'
 import { ImagePath, formats } from './ImagePath.ts'
-import type { UploadEvent } from './UploadEvent.ts'
+import type { UploadEvent, UploadEventMap } from './UploadEvent.ts'
 import { getSettings } from './db.ts'
 import { getTime } from './utils.ts'
 
@@ -32,13 +32,13 @@ export function processImages(
   uploadEvent: UploadEvent
 ) {
   const worker = new Worker(
-    import.meta.resolve('./workers/process-images.ts'),
+    import.meta.resolve('../workers/process-images.ts'),
     { type: 'module' }
   )
   worker.postMessage(inMessage)
   return new Promise<ProcessOut[]>((resolve) => {
     const handler = (
-      event: MessageEvent<ProcessOut[] | { total: number; completed: number }>
+      event: MessageEvent<ProcessOut[] | UploadEventMap['progress']>
     ) => {
       const message = event.data
       if ('total' in message) {
@@ -140,7 +140,7 @@ export async function uploadImages(
       return { metadata: { ...saveParams, width, height }, variants }
     }),
   }
-  const worker = new Worker(import.meta.resolve('./workers/save-images.ts'), {
+  const worker = new Worker(import.meta.resolve('../workers/save-images.ts'), {
     type: 'module',
   })
   worker.postMessage(saveIn)

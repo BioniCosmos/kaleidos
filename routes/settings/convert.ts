@@ -15,33 +15,39 @@ import { redirect } from '../../lib/utils.ts'
 import type { State } from '../_middleware.ts'
 
 export const handler: Handlers<unknown, State> = {
-  async GET(_req, ctx) {
+  async POST(req, ctx) {
     const { db, user } = ctx.state
     if (!user.isAdmin) {
       return redirect('/error?message=No access')
     }
 
-    const operation = ctx.url.searchParams.get('operation')
+    const { operation }: { operation: string } = await req.json()
     if (operation !== 'format' && operation !== 'thumbnail') {
       return redirect('/error?message=Unsupported operation')
     }
 
-    const { uploadEvent } = UploadEvent.of()
-    const inMessages = await getLackVariants(db, operation)
-    const outMessages = await processImages(inMessages, uploadEvent)
-    const jobs = outMessages
-      .flatMap(({ variants }) => variants)
-      .map(({ tmpFile, file }) =>
-        ensureDir(dirname(file)).then(() => Deno.rename(tmpFile, file))
+    const { id, uploadEvent } = UploadEvent.of()
+    const convert = async () => {
+      const outMessages = await getLackVariants(db, operation).then(
+        (inMessages) => processImages(inMessages, uploadEvent)
       )
-    await Promise.all(jobs)
-    return redirect('/settings')
+      const jobs = outMessages
+        .flatMap(({ variants }) => variants)
+        .map(({ tmpFile, file }) =>
+          ensureDir(dirname(file)).then(() => Deno.rename(tmpFile, file))
+        )
+      await Promise.all(jobs)
+    }
+    convert()
+    return new Response(id, { status: 202 })
   },
 }
 
 async function getLackVariants(db: DB, operation: 'format' | 'thumbnail') {
+  const tmpDir = join(config.workingDir, 'images/tmp')
+  await ensureDir(tmpDir)
   const converted = await Array.fromAsync(
-    walk(join(config.workingDir, 'images/tmp'), {
+    walk(tmpDir, {
       includeDirs: false,
       match: operation === 'format' ? [/^(?!.*\.tn\.).*$/] : [/.*\.tn\..*/],
     })

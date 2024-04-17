@@ -1,4 +1,5 @@
 import type { DB } from 'sqlite'
+import { GenerateVariants } from '../islands/GenerateVariants.tsx'
 import { getSettings } from '../lib/db.ts'
 import Button from './Button.tsx'
 import Form from './Form.tsx'
@@ -39,14 +40,7 @@ export default function AdminSettings({ db }: { db: DB }) {
         <Button>Save changes</Button>
       </Form>
       <hr />
-      <Form action="/settings/convert">
-        <Button name="operation" value="format">
-          Generate images of other formats
-        </Button>
-        <Button name="operation" value="thumbnail">
-          Generate all thumbnails
-        </Button>
-      </Form>
+      <GenerateVariants />
     </>
   )
 }

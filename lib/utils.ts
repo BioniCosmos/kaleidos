@@ -4,6 +4,7 @@ import {
 } from 'https://deno.land/x/jose@v5.2.0/index.ts'
 import ShortUniqueId from 'https://esm.sh/short-unique-id@5.0.3'
 import { useRef } from 'preact/hooks'
+import type { UploadEventMap } from './UploadEvent.ts'
 import type { User } from './db.ts'
 
 export function redirect(path: string) {
@@ -106,4 +107,29 @@ export function setToArray<T>(set: Set<T>) {
 let _id = 0
 export function useId() {
   return useRef(`KRI-${_id++}`).current
+}
+
+export function getProgress(
+  processProgress: UploadEventMap['progress'] | null,
+  transferProgress?: Pick<ProgressEvent, 'loaded' | 'total'> | null,
+  round = false
+) {
+  const getPercent = (percent: number): `${number}%` =>
+    `${round ? Math.round(percent) : percent}%`
+
+  const { completed: processCompleted, total: processTotal } =
+    processProgress ?? { completed: 0, total: 1 }
+  if (transferProgress === undefined) {
+    const percent = (processCompleted / processTotal) * 100
+    return getPercent(percent)
+  }
+
+  const { loaded: transferLoaded, total: transferTotal } = transferProgress ?? {
+    loaded: 0,
+    total: 1,
+  }
+  const percent =
+    (transferLoaded / transferTotal) * 50 +
+    (processCompleted / processTotal) * 50
+  return getPercent(percent)
 }
