@@ -21,6 +21,7 @@ export async function handler(req: Request, ctx: FreshContext<State>) {
   }
 
   const isToLoginOrSignup = ctx.route === '/login' || ctx.route === '/signup'
+  const isPostUser = ctx.route === '/user' && req.method === 'POST'
   const userId = await verifyToken(req.headers.get('Cookie'))
   const isValid = userId !== null
 
@@ -32,11 +33,13 @@ export async function handler(req: Request, ctx: FreshContext<State>) {
    * | 1           | 0         | -           |
    * | 1           | 1         | to `/`      |
    */
-  if (!isToLoginOrSignup && !isValid) {
-    return redirect('/login')
-  }
-  if (isToLoginOrSignup && isValid) {
-    return redirect('/')
+  if (!isPostUser) {
+    if (!isToLoginOrSignup && !isValid) {
+      return redirect('/login')
+    }
+    if (isToLoginOrSignup && isValid) {
+      return redirect('/')
+    }
   }
 
   ctx.state = new State(userId, true)
