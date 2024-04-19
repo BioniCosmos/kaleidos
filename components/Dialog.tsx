@@ -55,7 +55,7 @@ export default function Dialog({
   return (
     <dialog
       ref={dialogRef}
-      class="p-6 rounded-xl space-y-8 dark:bg-zinc-950 dark:text-zinc-50 dark:border-zinc-800 dark:border"
+      class="p-6 rounded-xl space-y-8 dark:bg-zinc-950 dark:text-zinc-50 dark:border-zinc-800 dark:border !m-auto"
     >
       {title !== undefined && <h2 class="text-2xl font-bold">{title}</h2>}
       <div class="space-y-6 dark:text-zinc-50 dark:text-opacity-60">

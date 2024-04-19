@@ -32,6 +32,7 @@ import * as $Images from "./islands/Images.tsx";
 import * as $NewAlbum from "./islands/NewAlbum.tsx";
 import * as $Theme from "./islands/Theme.tsx";
 import * as $UploadImage from "./islands/UploadImage.tsx";
+import * as $UserManager from "./islands/UserManager.tsx";
 import { type Manifest } from "$fresh/server.ts";
 
 const manifest = {
@@ -68,6 +69,7 @@ const manifest = {
     "./islands/NewAlbum.tsx": $NewAlbum,
     "./islands/Theme.tsx": $Theme,
     "./islands/UploadImage.tsx": $UploadImage,
+    "./islands/UserManager.tsx": $UserManager,
   },
   baseUrl: import.meta.url,
 } satisfies Manifest;

@@ -1,6 +1,7 @@
 import type { DB } from 'sqlite'
 import { GenerateVariants } from '../islands/GenerateVariants.tsx'
-import { getSettings } from '../lib/db.ts'
+import UserManager from '../islands/UserManager.tsx'
+import { getSettings, type User } from '../lib/db.ts'
 import Button from './Button.tsx'
 import Form from './Form.tsx'
 import SelectMenu from './SelectMenu.tsx'
@@ -33,6 +34,7 @@ export default function AdminSettings({ db }: { db: DB }) {
       defaultValue={settings[item.name]}
     />
   ))
+  const users = db.queryEntries<User>('SELECT * FROM users')
   return (
     <>
       <Form method="post" action="/settings/admin">
@@ -41,6 +43,8 @@ export default function AdminSettings({ db }: { db: DB }) {
       </Form>
       <hr />
       <GenerateVariants />
+      <hr />
+      <UserManager users={users} />
     </>
   )
 }
