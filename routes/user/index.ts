@@ -53,7 +53,7 @@ export const handler: Handlers<unknown, State> = {
       }))
 
     if (!userIsAdmin && updatedUser.id !== id) {
-      return redirect('/error?message=No access')
+      return new Response('No access', { status: 403 })
     }
 
     db.query(
@@ -62,7 +62,7 @@ export const handler: Handlers<unknown, State> = {
       } WHERE id = :id`,
       updatedUser
     )
-    return redirect('/settings')
+    return new Response(null, { status: 204 })
   },
   async DELETE(req, ctx) {},
 }
