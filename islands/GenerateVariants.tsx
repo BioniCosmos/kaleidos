@@ -1,4 +1,4 @@
-import ky from 'https://esm.sh/ky@1.2.3'
+import ky from 'ky'
 import { useState } from 'preact/hooks'
 import Form from '../components/Form.tsx'
 import ProgressButton from '../components/ProgressButton.tsx'

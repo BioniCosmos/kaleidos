@@ -38,6 +38,31 @@ export const handler: Handlers<unknown, State> = {
     )
     return redirect(userIsAdmin ? '/settings' : '/login')
   },
-  async PUT(req, ctx) {},
+
+  async PUT(req, ctx) {
+    const { user, db } = ctx.state
+    const { id, isAdmin: userIsAdmin } = user
+    const updatedUser = await req
+      .formData()
+      .then((formData) => formData.entries())
+      .then(Object.fromEntries)
+      .then(({ password, isAdmin, ...user }: User) => ({
+        ...user,
+        password: hash(password),
+        isAdmin: userIsAdmin && isAdmin,
+      }))
+
+    if (!userIsAdmin && updatedUser.id !== id) {
+      return redirect('/error?message=No access')
+    }
+
+    db.query(
+      `UPDATE users SET name = :name, isAdmin = :isAdmin${
+        updatedUser.password !== undefined ? ', password = :password' : ''
+      } WHERE id = :id`,
+      updatedUser
+    )
+    return redirect('/settings')
+  },
   async DELETE(req, ctx) {},
 }

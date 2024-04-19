@@ -5,7 +5,7 @@ import Button from './Button.tsx'
 interface Props extends JSX.HTMLAttributes<HTMLDialogElement> {
   title?: string
   close: () => void
-  onClickConfirm: () => void | Promise<void> | false
+  onClickConfirm: () => unknown | Promise<unknown> | false
   onClickCancel?: () => void
   cleanup?: () => void
   cancelDisabled?: boolean

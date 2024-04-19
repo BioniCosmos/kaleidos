@@ -30,7 +30,11 @@ export default function ProgressButton({
         )}
         {...props}
       >
-        {p === '100%' ? <Icon name="check" /> : children}
+        {p === '100%' ? (
+          <Icon name="check" options={{ class: 'mx-auto' }} />
+        ) : (
+          children
+        )}
       </Button>
     </div>
   )
