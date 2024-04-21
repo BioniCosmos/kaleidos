@@ -1,3 +1,4 @@
+import type { User } from '@db'
 import {
   SignJWT,
   jwtVerify as verify,
@@ -5,7 +6,6 @@ import {
 import ShortUniqueId from 'https://esm.sh/short-unique-id@5.0.3'
 import { useRef } from 'preact/hooks'
 import type { UploadEventMap } from './UploadEvent.ts'
-import type { User } from './db.ts'
 
 export function redirect(path: string) {
   return new Response(null, {

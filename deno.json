@@ -27,7 +27,8 @@
     "sharp": "npm:sharp@0.33.2",
     "clsx": "https://esm.sh/clsx@2.1.0",
     "feather-icons": "https://esm.sh/feather-icons@4.29.1",
-    "ky": "https://esm.sh/ky@1.2.3"
+    "ky": "https://esm.sh/ky@1.2.3",
+    "@db": "./lib/db/db.ts"
   },
   "compilerOptions": {
     "jsx": "react-jsx",

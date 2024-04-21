@@ -1,6 +1,7 @@
 import type { Handlers } from '$fresh/server.ts'
+import type { User } from '@db'
 import { hash } from 'argon2'
-import { getSettings, type User } from '../../lib/db.ts'
+import { getSettings } from '../../lib/db.ts'
 import { redirect } from '../../lib/utils.ts'
 import type { State } from '../_middleware.ts'
 

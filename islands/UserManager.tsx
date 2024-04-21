@@ -1,3 +1,4 @@
+import type { User } from '@db'
 import { clsx } from 'clsx'
 import ky from 'ky'
 import { useRef, useState } from 'preact/hooks'
@@ -7,7 +8,6 @@ import Form from '../components/Form.tsx'
 import Icon from '../components/Icon.tsx'
 import Input from '../components/Input.tsx'
 import SelectMenu from '../components/SelectMenu.tsx'
-import type { User } from '../lib/db.ts'
 
 interface Props {
   users: User[]

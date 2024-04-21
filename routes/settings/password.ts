@@ -1,4 +1,5 @@
 import type { Handlers } from '$fresh/server.ts'
+import { repo } from '@db'
 import { hash, verify } from 'argon2'
 import { redirect } from '../../lib/utils.ts'
 import type { State } from '../_middleware.ts'
@@ -8,7 +9,7 @@ export const handler: Handlers<unknown, State> = {
     const formData = await req.formData()
     const currentPassword = formData.get('currentPassword') as string
 
-    const { db, user } = ctx.state
+    const { user } = ctx.state
     const { id, password } = user
 
     if (!verify(currentPassword, password)) {
@@ -22,7 +23,7 @@ export const handler: Handlers<unknown, State> = {
     }
 
     const hashedPassword = hash(newPassword as string)
-    db.query('UPDATE users SET password = ? WHERE id = ?', [hashedPassword, id])
+    repo.user.update({ where: { id }, data: { password: hashedPassword } })
     return redirect('/settings')
   },
 }

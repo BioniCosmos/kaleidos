@@ -1,7 +1,8 @@
+import { repo } from '@db'
 import type { DB } from 'sqlite'
 import { GenerateVariants } from '../islands/GenerateVariants.tsx'
 import UserManager from '../islands/UserManager.tsx'
-import { getSettings, type User } from '../lib/db.ts'
+import { getSettings } from '../lib/db.ts'
 import Button from './Button.tsx'
 import Form from './Form.tsx'
 import SelectMenu from './SelectMenu.tsx'
@@ -34,7 +35,7 @@ export default function AdminSettings({ db }: { db: DB }) {
       defaultValue={settings[item.name]}
     />
   ))
-  const users = db.queryEntries<User>('SELECT * FROM users')
+  const users = repo.user.findMany()
   return (
     <>
       <Form method="post" action="/settings/admin">

@@ -1,5 +1,6 @@
 import { defineRoute, type Handlers } from '$fresh/server.ts'
 import { join } from '$std/path/mod.ts'
+import type { User } from '@db'
 import type { FeatherIconNames } from 'feather-icons'
 import Icon from '../../components/Icon.tsx'
 import Title from '../../components/Title.tsx'
@@ -11,7 +12,6 @@ import {
   getAlbumOptions,
   type Album,
   type Image,
-  type User,
 } from '../../lib/db.ts'
 import { redirect } from '../../lib/utils.ts'
 import type { State } from '../_middleware.ts'

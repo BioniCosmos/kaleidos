@@ -1,25 +1,21 @@
 import { type Handlers } from '$fresh/server.ts'
+import { repo } from '@db'
 import { verify } from 'argon2'
 import Button from '../components/Button.tsx'
 import Form from '../components/Form.tsx'
 import Input from '../components/Input.tsx'
 import Title from '../components/Title.tsx'
-import { type User } from '../lib/db.ts'
 import { jwtSign, redirect } from '../lib/utils.ts'
 import type { State } from './_middleware.ts'
 
 export const handler: Handlers<unknown, State> = {
-  async POST(req, ctx) {
+  async POST(req) {
     const loginInfo = await req.formData()
     const id = loginInfo.get('id') as string
     const password = loginInfo.get('password') as string
 
-    const { db } = ctx.state
-    const user = db
-      .queryEntries<User>('SELECT * FROM users WHERE id = :id', { id })
-      .at(0)
-
-    if (user === undefined) {
+    const user = repo.user.findUnique({ where: { id } })
+    if (user === null) {
       return redirect('/error?message=User not found')
     }
 

@@ -1,3 +1,4 @@
+import type { User } from '@db'
 import { DB } from 'sqlite'
 
 export type Image = {
@@ -16,13 +17,6 @@ export type Album = {
   id: number
   name: string
   userId: string
-}
-
-export type User = {
-  id: string
-  password: string
-  name: string
-  isAdmin: boolean
 }
 
 export type Setting = {

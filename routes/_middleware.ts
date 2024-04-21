@@ -1,8 +1,8 @@
 import type { FreshContext } from '$fresh/server.ts'
 import { join } from '$std/path/mod.ts'
+import { repo, type User } from '@db'
 import { DB } from 'sqlite'
 import config from '../config.ts'
-import type { User } from '../lib/db.ts'
 import {
   createAlbumTable,
   createImageTable,
@@ -42,7 +42,7 @@ export async function handler(req: Request, ctx: FreshContext<State>) {
     }
   }
 
-  ctx.state = new State(userId, true)
+  ctx.state = new State(userId)
   if (ctx.route.startsWith('/settings') || ctx.route === '/login') {
     ctx.state.refreshUser(userId)
   }
@@ -53,7 +53,7 @@ export class State {
   static #user: User | undefined
   static #db: DB
 
-  constructor(userId: string | null, userInit: boolean) {
+  constructor(userId: string | null) {
     if (State.#db === undefined) {
       State.#db = new DB(join(config.workingDir, 'kaleidos.db'))
       State.#db.execute('PRAGMA foreign_keys = ON')
@@ -61,16 +61,7 @@ export class State {
       createAlbumTable(State.#db)
       createImageTable(State.#db)
       createSettingTable(State.#db)
-
-      if (userInit) {
-        const defaultPassword = hash('123456')
-        State.#db.query(
-          `INSERT OR IGNORE INTO users VALUES('admin', ?, '', TRUE)`,
-          [defaultPassword]
-        )
-      }
     }
-
     if (userId !== null && State.#user === undefined) {
       this.refreshUser(userId)
     }
@@ -86,12 +77,8 @@ export class State {
 
   refreshUser(userId: string | null) {
     if (userId !== null) {
-      const [user] = State.#db.queryEntries<User>(
-        'SELECT * FROM users WHERE id = ?',
-        [userId]
-      )
-      user.isAdmin = (user.isAdmin as unknown as number) === 1
-      State.#user = user
+      const user = repo.user.findUnique({ where: { id: userId } })
+      State.#user = user!
     } else {
       State.#user = undefined
     }
