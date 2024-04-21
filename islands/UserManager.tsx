@@ -1,6 +1,6 @@
 import type { User } from '@db'
 import { clsx } from 'clsx'
-import ky from 'ky'
+import ky, { type HTTPError } from 'ky'
 import { useRef, useState } from 'preact/hooks'
 import Button from '../components/Button.tsx'
 import Dialog from '../components/Dialog.tsx'
@@ -19,8 +19,8 @@ export default function UserManager({ users }: Props) {
   const [method, setMethod] = useState('')
   const formRef = useRef<HTMLFormElement>(null)
   const options = [
-    { value: 0, name: 'No' },
-    { value: 1, name: 'Yes' },
+    { value: 'false', name: 'No' },
+    { value: 'true', name: 'Yes' },
   ]
   const submit = () => {
     const form = formRef.current!
@@ -31,7 +31,13 @@ export default function UserManager({ users }: Props) {
     if (body.get('password') === '') {
       body.delete('password')
     }
-    return ky('/user', { method, body }).then(() => location.reload())
+    return ky('/user', { method, body })
+      .then(() => location.reload())
+      .catch((error: HTTPError) =>
+        error.response
+          .text()
+          .then((message) => location.assign(`/error?message=${message}`))
+      )
   }
   const create = () => {
     setMethod('POST')
@@ -91,7 +97,7 @@ export default function UserManager({ users }: Props) {
         onClickConfirm={submit}
         cleanup={setUser.bind(null, null)}
       >
-        <Form method="post" action="/user" ref={formRef}>
+        <Form ref={formRef}>
           <div class={clsx({ hidden: user !== null })}>
             <Input label="Id" name="id" defaultValue={user?.id} required />
           </div>

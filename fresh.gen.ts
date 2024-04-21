@@ -19,7 +19,6 @@ import * as $settings_admin from "./routes/settings/admin.ts";
 import * as $settings_convert from "./routes/settings/convert.ts";
 import * as $settings_index from "./routes/settings/index.tsx";
 import * as $settings_password from "./routes/settings/password.ts";
-import * as $settings_profile from "./routes/settings/profile.ts";
 import * as $signup from "./routes/signup.tsx";
 import * as $user_index from "./routes/user/index.ts";
 import * as $AlbumInfo from "./islands/AlbumInfo.tsx";
@@ -33,6 +32,7 @@ import * as $NewAlbum from "./islands/NewAlbum.tsx";
 import * as $Theme from "./islands/Theme.tsx";
 import * as $UploadImage from "./islands/UploadImage.tsx";
 import * as $UserManager from "./islands/UserManager.tsx";
+import * as $UserSettings from "./islands/UserSettings.tsx";
 import { type Manifest } from "$fresh/server.ts";
 
 const manifest = {
@@ -54,7 +54,6 @@ const manifest = {
     "./routes/settings/convert.ts": $settings_convert,
     "./routes/settings/index.tsx": $settings_index,
     "./routes/settings/password.ts": $settings_password,
-    "./routes/settings/profile.ts": $settings_profile,
     "./routes/signup.tsx": $signup,
     "./routes/user/index.ts": $user_index,
   },
@@ -70,6 +69,7 @@ const manifest = {
     "./islands/Theme.tsx": $Theme,
     "./islands/UploadImage.tsx": $UploadImage,
     "./islands/UserManager.tsx": $UserManager,
+    "./islands/UserSettings.tsx": $UserSettings,
   },
   baseUrl: import.meta.url,
 } satisfies Manifest;

@@ -1,9 +1,26 @@
 import type { Handlers } from '$fresh/server.ts'
-import type { User } from '@db'
+import { repo, type User } from '@db'
 import { hash } from 'argon2'
+import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts'
+import { fromZodError } from 'https://esm.sh/zod-validation-error@3.1.0'
 import { getSettings } from '../../lib/db.ts'
 import { redirect } from '../../lib/utils.ts'
 import type { State } from '../_middleware.ts'
+
+const updateSchema = z.object({
+  id: z.string(),
+  password: z.string().transform(hash).optional(),
+  name: z.string().optional(),
+  isAdmin: z.preprocess((val) => {
+    if (val === 'true') {
+      return true
+    }
+    if (val === 'false') {
+      return false
+    }
+    return val
+  }, z.boolean().optional()),
+})
 
 export const handler: Handlers<unknown, State> = {
   async POST(req, ctx) {
@@ -41,28 +58,29 @@ export const handler: Handlers<unknown, State> = {
   },
 
   async PUT(req, ctx) {
-    const { user, db } = ctx.state
-    const { id, isAdmin: userIsAdmin } = user
-    const updatedUser = await req
+    const { user } = ctx.state
+    const { id, isAdmin } = user
+    const fields = await req
       .formData()
-      .then((formData) => formData.entries())
-      .then(Object.fromEntries)
-      .then(({ password, isAdmin, ...user }: User) => ({
-        ...user,
-        password: hash(password),
-        isAdmin: userIsAdmin && isAdmin,
-      }))
-
-    if (!userIsAdmin && updatedUser.id !== id) {
-      return new Response('No access', { status: 403 })
+      .then((formData) => Object.fromEntries(formData.entries()))
+    const parseResult = updateSchema.safeParse(fields)
+    if (!parseResult.success) {
+      return new Response(fromZodError(parseResult.error).message, {
+        status: 400,
+      })
     }
 
-    db.query(
-      `UPDATE users SET name = :name, isAdmin = :isAdmin${
-        updatedUser.password !== undefined ? ', password = :password' : ''
-      } WHERE id = :id`,
-      updatedUser
-    )
+    const { data: updateUser } = parseResult
+    if (
+      !isAdmin &&
+      (updateUser.id !== id ||
+        updateUser.password !== undefined ||
+        updateUser.isAdmin === true)
+    ) {
+      return new Response('Unauthorized', { status: 403 })
+    }
+
+    repo.user.update({ where: { id: updateUser.id }, data: updateUser })
     return new Response(null, { status: 204 })
   },
   async DELETE(req, ctx) {},

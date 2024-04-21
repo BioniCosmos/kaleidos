@@ -4,19 +4,17 @@ import Button from '../../components/Button.tsx'
 import Form from '../../components/Form.tsx'
 import Input from '../../components/Input.tsx'
 import Title from '../../components/Title.tsx'
+import UserSettings from '../../islands/UserSettings.tsx'
 import type { State } from '../_middleware.ts'
 
 export default function Settings({ state }: PageProps<unknown, State>) {
   const { user, db } = state
-  const { name, isAdmin } = user
+  const { isAdmin } = user
   return (
     <>
       <Title>Settings</Title>
       <div class="space-y-8 max-w-3xl mx-auto">
-        <Form method="post" action="/settings/profile">
-          <Input label="Name" name="name" value={name} required />
-          <Button>Save changes</Button>
-        </Form>
+        <UserSettings user={user} />
         <hr />
         <Form method="post" action="/settings/password">
           <Input
