@@ -29,6 +29,8 @@ export default function Dialog({
       dialogRef.current?.showModal()
     } else {
       dialogRef.current?.close()
+      cleanup?.()
+      setIsWorking(false)
     }
   }, [open])
 
@@ -46,10 +48,7 @@ export default function Dialog({
     } else {
       onClickCancel?.()
     }
-
-    cleanup?.()
     close()
-    setIsWorking(false)
   }
 
   return (

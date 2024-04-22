@@ -83,5 +83,17 @@ export const handler: Handlers<unknown, State> = {
     repo.user.update({ where: { id: updateUser.id }, data: updateUser })
     return new Response(null, { status: 204 })
   },
-  async DELETE(req, ctx) {},
+
+  async DELETE(req, ctx) {
+    const id = await req
+      .formData()
+      .then((formData) => formData.get('id') as string)
+    const { user } = ctx.state
+    if (!user.isAdmin && id !== user.id) {
+      return new Response('Unauthorized', { status: 403 })
+    }
+
+    repo.user.delete({ where: { id } })
+    return new Response(null, { status: 204 })
+  },
 }

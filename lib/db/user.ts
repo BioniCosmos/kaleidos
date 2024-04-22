@@ -8,7 +8,7 @@ export class UserRepo {
     this.#db = db
   }
 
-  findUnique({ where }: { where: Pick<User, 'id'> }) {
+  findUnique({ where }: { where: UserWhereUniqueInput }) {
     return (
       this.#db
         .queryEntries<User>('SELECT * FROM users WHERE id = :id', where)
@@ -39,7 +39,7 @@ export class UserRepo {
     where,
     data,
   }: {
-    where: Pick<User, 'id'>
+    where: UserWhereUniqueInput
     data: Partial<Omit<User, 'id'>>
   }) {
     const set = Object.entries(data)
@@ -61,4 +61,17 @@ export class UserRepo {
         .at(0) ?? null
     )
   }
+
+  delete({ where }: { where: UserWhereUniqueInput }) {
+    return (
+      this.#db
+        .queryEntries<User>(
+          'DELETE FROM users WHERE id = :id RETURNING *',
+          where
+        )
+        .at(0) ?? null
+    )
+  }
 }
+
+export type UserWhereUniqueInput = Pick<User, 'id'>

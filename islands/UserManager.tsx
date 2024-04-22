@@ -16,7 +16,7 @@ interface Props {
 export default function UserManager({ users }: Props) {
   const [open, setOpen] = useState(false)
   const [user, setUser] = useState<User | null>(null)
-  const [method, setMethod] = useState('')
+  const methodRef = useRef('')
   const formRef = useRef<HTMLFormElement>(null)
   const options = [
     { value: 'false', name: 'No' },
@@ -24,14 +24,14 @@ export default function UserManager({ users }: Props) {
   ]
   const submit = () => {
     const form = formRef.current!
-    if (!form.reportValidity()) {
+    if (methodRef.current !== 'DELETE' && !form.reportValidity()) {
       return false
     }
     const body = new FormData(form)
     if (body.get('password') === '') {
       body.delete('password')
     }
-    return ky('/user', { method, body })
+    return ky('/user', { method: methodRef.current, body })
       .then(() => location.reload())
       .catch((error: HTTPError) =>
         error.response
@@ -40,13 +40,18 @@ export default function UserManager({ users }: Props) {
       )
   }
   const create = () => {
-    setMethod('POST')
+    methodRef.current = 'POST'
     setOpen(true)
   }
   const edit = (user: User) => () => {
-    setMethod('PUT')
+    methodRef.current = 'PUT'
     setUser(user)
     setOpen(true)
+  }
+  const deleteSubmit = async () => {
+    methodRef.current = 'DELETE'
+    await submit()
+    setOpen(false)
   }
   return (
     <>
@@ -75,7 +80,7 @@ export default function UserManager({ users }: Props) {
               <td class="px-6 py-4">
                 <Icon name={user.isAdmin ? 'check' : 'x'} />
               </td>
-              <td class="px-6 py-4">
+              <td class="px-6 py-4 divide-x-2 divide-black">
                 <button
                   class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
                   onClick={edit(user)}
@@ -115,6 +120,15 @@ export default function UserManager({ users }: Props) {
             defaultValue={user?.isAdmin.toString()}
             required
           />
+          {user !== null && (
+            <button
+              type="button"
+              class="text-red-700 hover:text-white border border-red-500 hover:bg-red-500 font-medium text-sm rounded-lg px-4 py-1.5 text-center transition"
+              onClick={deleteSubmit}
+            >
+              Delete
+            </button>
+          )}
         </Form>
       </Dialog>
     </>
