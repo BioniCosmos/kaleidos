@@ -23,6 +23,12 @@ export default defineRoute<State>((_req, ctx) => {
         <Input label="Id" name="id" required />
         <Input label="Password" type="password" name="password" required />
         <Button>Sign up</Button>
+        <div class="text-sm text-zinc-600">
+          Already have an account?{' '}
+          <a href="/login" class="text-blue-500 underline">
+            Sign in
+          </a>
+        </div>
       </Form>
     </>
   )

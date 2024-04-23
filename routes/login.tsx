@@ -1,10 +1,11 @@
-import { type Handlers } from '$fresh/server.ts'
+import { defineRoute, type Handlers } from '$fresh/server.ts'
 import { repo } from '@db'
 import { verify } from 'argon2'
 import Button from '../components/Button.tsx'
 import Form from '../components/Form.tsx'
 import Input from '../components/Input.tsx'
 import Title from '../components/Title.tsx'
+import { getSettings } from '../lib/db.ts'
 import { jwtSign, redirect } from '../lib/utils.ts'
 import type { State } from './_middleware.ts'
 
@@ -32,7 +33,9 @@ export const handler: Handlers<unknown, State> = {
   },
 }
 
-export default function Login() {
+export default defineRoute<State>((_req, ctx) => {
+  const { db } = ctx.state
+  const allowSignup = getSettings(db).signup !== 'disable'
   return (
     <>
       <Title>Login</Title>
@@ -43,7 +46,15 @@ export default function Login() {
         <Input label="Id" name="id" required />
         <Input label="Password" type="password" name="password" required />
         <Button>Login</Button>
+        {allowSignup && (
+          <div class="text-sm text-zinc-600">
+            Don’t have an account?{' '}
+            <a href="/signup" class="text-blue-500 underline">
+              Sign up
+            </a>
+          </div>
+        )}
       </Form>
     </>
   )
-}
+})
