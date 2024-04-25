@@ -1,6 +1,7 @@
 import type { Handlers } from '$fresh/server.ts'
 import { repo } from '@db'
 import { hash, verify } from 'argon2'
+import { Session } from '../../lib/Session.ts'
 import { redirect } from '../../lib/utils.ts'
 import type { State } from '../_middleware.ts'
 
@@ -23,7 +24,10 @@ export const handler: Handlers<unknown, State> = {
     }
 
     const hashedPassword = hash(newPassword as string)
-    repo.user.update({ where: { id }, data: { password: hashedPassword } })
+    repo.db.transaction(() => {
+      repo.user.update({ where: { id }, data: { password: hashedPassword } })
+      Session.revokeByUserId(user.id)
+    })
     return redirect('/settings')
   },
 }

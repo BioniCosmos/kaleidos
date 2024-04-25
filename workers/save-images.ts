@@ -20,6 +20,7 @@ export interface OutMessage {
 addEventListener('message', (event) => {
   const { albumId, images }: InMessage = event.data
   const db = new DB(join(config.workingDir, 'kaleidos.db'))
+  db.execute('PRAGMA foreign_keys = ON')
 
   images.forEach(({ metadata, variants }) => {
     const { name, ext, date, path, size, width, height } = metadata

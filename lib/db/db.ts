@@ -1,6 +1,7 @@
 import { join } from '$std/path/mod.ts'
 import { DB } from 'sqlite'
 import config from '../../config.ts'
+import { SessionRepo } from './session.ts'
 import { UserRepo } from './user.ts'
 
 export class Repo {
@@ -26,6 +27,11 @@ export class Repo {
       }
     },
   })
+  session = new SessionRepo(this.db)
+
+  constructor() {
+    this.db.execute('PRAGMA foreign_keys = ON')
+  }
 }
 
 export const repo = new Repo()
@@ -35,4 +41,10 @@ export type User = {
   password: string
   name: string
   isAdmin: boolean
+}
+
+export type Session = {
+  id: string
+  userId: string
+  expiryTime: number
 }

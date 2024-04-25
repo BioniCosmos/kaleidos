@@ -4,6 +4,7 @@ import { hash } from 'argon2'
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts'
 import { fromZodError } from 'https://esm.sh/zod-validation-error@3.1.0'
 import { SqliteError } from 'sqlite'
+import { Session } from '../../lib/Session.ts'
 import { getSettings } from '../../lib/db.ts'
 import { redirect } from '../../lib/utils.ts'
 import type { State } from '../_middleware.ts'
@@ -81,7 +82,12 @@ export const handler: Handlers<unknown, State> = {
       return new Response('Unauthorized', { status: 403 })
     }
 
-    repo.user.update({ where: { id: updateUser.id }, data: updateUser })
+    repo.db.transaction(() => {
+      repo.user.update({ where: { id: updateUser.id }, data: updateUser })
+      if (updateUser.password !== undefined) {
+        Session.revokeByUserId(updateUser.id)
+      }
+    })
     return new Response(null, { status: 204 })
   },
 
@@ -95,11 +101,14 @@ export const handler: Handlers<unknown, State> = {
     }
 
     try {
-      const user = repo.user.delete({ where: { id } })
-      if (user === null) {
-        return ctx.renderNotFound()
-      }
-      return new Response(null, { status: 204 })
+      return repo.db.transaction(() => {
+        Session.revokeByUserId(id)
+        const user = repo.user.delete({ where: { id } })
+        if (user === null) {
+          return ctx.renderNotFound()
+        }
+        return new Response(null, { status: 204 })
+      })
     } catch (error) {
       if (
         error instanceof SqliteError &&

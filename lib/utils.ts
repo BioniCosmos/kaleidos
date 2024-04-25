@@ -1,8 +1,3 @@
-import type { User } from '@db'
-import {
-  SignJWT,
-  jwtVerify as verify,
-} from 'https://deno.land/x/jose@v5.2.0/index.ts'
 import ShortUniqueId from 'https://esm.sh/short-unique-id@5.0.3'
 import { useRef } from 'preact/hooks'
 import type { UploadEventMap } from './UploadEvent.ts'
@@ -12,59 +7,6 @@ export function redirect(path: string) {
     status: 303,
     headers: { Location: encodeURI(path) },
   })
-}
-
-let _secret: Uint8Array | undefined
-const secret = async () => {
-  if (_secret === undefined) {
-    const config = (await import('../config.ts')).default
-    _secret = new TextEncoder().encode(config.secret)
-  }
-  return _secret
-}
-
-export async function jwtSign(user: User) {
-  const date = new Date()
-  const token = await new SignJWT({ sub: user.id })
-    .setProtectedHeader({ typ: 'JWT', alg: 'HS256' })
-    .setExpirationTime(date.setDate(date.getDate() + 1))
-    .sign(await secret())
-  return token
-}
-
-export async function jwtVerify(token: string) {
-  try {
-    const {
-      payload: { sub },
-    } = await verify(token, await secret())
-    if (sub === undefined) {
-      return null
-    }
-    return sub
-  } catch {
-    return null
-  }
-}
-
-export function getToken(cookie: string) {
-  return cookie
-    .split('; ')
-    .map((item) => item.split('='))
-    .find(([key]) => key === 'token')
-    ?.at(1)
-}
-
-export function verifyToken(cookie: string | null) {
-  if (cookie === null) {
-    return Promise.resolve(null)
-  }
-
-  const token = getToken(cookie)
-  if (token === undefined) {
-    return Promise.resolve(null)
-  }
-
-  return jwtVerify(token)
 }
 
 export interface Timestamp {

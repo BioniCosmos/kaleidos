@@ -16,9 +16,6 @@
    $ sudo wget -P /opt/container/kaleidos https://raw.githubusercontent.com/BioniCosmos/kaleidos/master/config.ts
    ```
 
-> [!IMPORTANT]
-> It is recommended to modify `config.ts` according to your own situation, or at least the **`secret`**.
-
 2. Put the following into `/etc/systemd/system/container-kaleidos.service`.
 
    ```ini

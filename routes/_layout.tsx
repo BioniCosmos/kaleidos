@@ -8,7 +8,7 @@ export default function Layout({
   route,
   state,
   Component,
-}: PageProps<unknown, Partial<State>>) {
+}: PageProps<unknown, State>) {
   const { user } = state
   return (
     <>
@@ -16,7 +16,7 @@ export default function Layout({
         <a href="/" class="text-xl font-bold dark:text-zinc-50">
           {config.title}
         </a>
-        {user !== undefined && (
+        {user !== null && user !== undefined && (
           <div class="flex items-center gap-6">
             <Theme />
             <a href="/logout">

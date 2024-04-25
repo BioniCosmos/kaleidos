@@ -5,8 +5,9 @@ import Button from '../components/Button.tsx'
 import Form from '../components/Form.tsx'
 import Input from '../components/Input.tsx'
 import Title from '../components/Title.tsx'
+import { Session } from '../lib/Session.ts'
 import { getSettings } from '../lib/db.ts'
-import { jwtSign, redirect } from '../lib/utils.ts'
+import { redirect } from '../lib/utils.ts'
 import type { State } from './_middleware.ts'
 
 export const handler: Handlers<unknown, State> = {
@@ -25,10 +26,7 @@ export const handler: Handlers<unknown, State> = {
     }
 
     const res = redirect('/')
-    res.headers.set(
-      'Set-Cookie',
-      `token=${await jwtSign(user)}; Max-Age=${24 * 60 * 60}`
-    )
+    res.headers.set(...Session.add(user.id))
     return res
   },
 }
