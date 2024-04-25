@@ -3,6 +3,7 @@ import { repo, type User } from '@db'
 import { hash } from 'argon2'
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts'
 import { fromZodError } from 'https://esm.sh/zod-validation-error@3.1.0'
+import { SqliteError } from 'sqlite'
 import { getSettings } from '../../lib/db.ts'
 import { redirect } from '../../lib/utils.ts'
 import type { State } from '../_middleware.ts'
@@ -93,7 +94,20 @@ export const handler: Handlers<unknown, State> = {
       return new Response('Unauthorized', { status: 403 })
     }
 
-    repo.user.delete({ where: { id } })
-    return new Response(null, { status: 204 })
+    try {
+      const user = repo.user.delete({ where: { id } })
+      if (user === null) {
+        return ctx.renderNotFound()
+      }
+      return new Response(null, { status: 204 })
+    } catch (error) {
+      if (
+        error instanceof SqliteError &&
+        error.message === 'FOREIGN KEY constraint failed'
+      ) {
+        return new Response('User should be empty', { status: 400 })
+      }
+      throw error
+    }
   },
 }
