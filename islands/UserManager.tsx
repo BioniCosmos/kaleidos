@@ -16,6 +16,7 @@ interface Props {
 export default function UserManager({ users }: Props) {
   const [open, setOpen] = useState(false)
   const [user, setUser] = useState<User | null>(null)
+  const hasUser = user !== null
   const methodRef = useRef('')
   const formRef = useRef<HTMLFormElement>(null)
   const options = [
@@ -103,15 +104,15 @@ export default function UserManager({ users }: Props) {
         cleanup={setUser.bind(null, null)}
       >
         <Form ref={formRef}>
-          <div class={clsx({ hidden: user !== null })}>
+          <div class={clsx({ hidden: hasUser })}>
             <Input label="Id" name="id" defaultValue={user?.id} required />
           </div>
-          <Input label="Name" name="name" defaultValue={user?.name} required />
+          <Input label="Name" name="name" defaultValue={user?.name} />
           <Input
             label="Password"
             name="password"
             type="password"
-            required={user === null}
+            required={!hasUser}
           />
           <SelectMenu
             label="Admin"
@@ -120,7 +121,7 @@ export default function UserManager({ users }: Props) {
             defaultValue={user?.isAdmin.toString()}
             required
           />
-          {user !== null && (
+          {hasUser && (
             <button
               type="button"
               class="text-red-700 hover:text-white border border-red-500 hover:bg-red-500 font-medium text-sm rounded-lg px-4 py-1.5 text-center transition"
