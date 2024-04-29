@@ -1,6 +1,7 @@
 import type { User } from '@db'
+import { trpc } from '@trpc'
 import { clsx } from 'clsx'
-import ky, { type HTTPError } from 'ky'
+import ky, { HTTPError } from 'ky'
 import { useRef, useState } from 'preact/hooks'
 import Button from '../components/Button.tsx'
 import Dialog from '../components/Dialog.tsx'
@@ -32,13 +33,20 @@ export default function UserManager({ users }: Props) {
     if (body.get('password') === '') {
       body.delete('password')
     }
-    return ky('/user', { method: methodRef.current, body })
+    return (
+      methodRef.current === 'POST'
+        ? // @ts-ignore: Validation by server
+          trpc.user.create.mutate(Object.fromEntries(body.entries()))
+        : ky('/user', { body, method: methodRef.current })
+    )
       .then(() => location.reload())
-      .catch((error: HTTPError) =>
-        error.response
-          .text()
-          .then((message) => location.assign(`/error?message=${message}`))
-      )
+      .catch(async (error: Error) => {
+        const message =
+          error instanceof HTTPError
+            ? await error.response.text()
+            : error.message
+        location.assign(`/error?message=${message}`)
+      })
   }
   const create = () => {
     methodRef.current = 'POST'

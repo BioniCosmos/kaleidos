@@ -22,7 +22,7 @@ export function handler(req: Request, ctx: FreshContext<State>) {
   }
 
   const isToLoginOrSignup = ctx.route === '/login' || ctx.route === '/signup'
-  const isPostUser = ctx.route === '/user' && req.method === 'POST'
+  const isPostUser = ctx.url.pathname === '/trpc/user.create'
   const user = Session.verify(req.headers.get('Cookie'))
   const isValid = !!user
 

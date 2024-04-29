@@ -28,7 +28,12 @@
     "clsx": "https://esm.sh/clsx@2.1.0",
     "feather-icons": "https://esm.sh/feather-icons@4.29.1",
     "ky": "https://esm.sh/ky@1.2.3",
-    "@db": "./lib/db/db.ts"
+    "@db": "./lib/db/db.ts",
+    "@trpc/server": "npm:@trpc/server@next",
+    "@trpc/client": "npm:@trpc/client@next",
+    "@trpc": "./lib/trpc/client.ts",
+    "zod": "https://deno.land/x/zod@v3.22.4/mod.ts",
+    "zod-validation-error": "https://esm.sh/zod-validation-error@3.1.0"
   },
   "compilerOptions": {
     "jsx": "react-jsx",

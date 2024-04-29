@@ -1,64 +1,63 @@
 import type { Handlers } from '$fresh/server.ts'
-import { repo, type User } from '@db'
+import { repo } from '@db'
+import { TRPCError } from '@trpc/server'
 import { hash } from 'argon2'
-import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts'
-import { fromZodError } from 'https://esm.sh/zod-validation-error@3.1.0'
 import { SqliteError } from 'sqlite'
+import { z } from 'zod'
+import { fromZodError } from 'zod-validation-error'
 import { Session } from '../../lib/Session.ts'
 import { getSettings } from '../../lib/db.ts'
-import { redirect } from '../../lib/utils.ts'
+import { t } from '../../lib/trpc/trpc.ts'
 import type { State } from '../_middleware.ts'
+
+const strToBool = (val: unknown) => {
+  if (val === 'true') {
+    return true
+  }
+  if (val === 'false') {
+    return false
+  }
+  return val
+}
+
+const createSchema = z.object({
+  id: z.string().min(1),
+  password: z.string().min(1).transform(hash),
+  name: z.string().default(''),
+  isAdmin: z.preprocess(strToBool, z.boolean().optional()),
+})
 
 const updateSchema = z.object({
   id: z.string(),
-  password: z.string().transform(hash).optional(),
+  password: z.string().min(1).transform(hash).optional(),
   name: z.string().optional(),
-  isAdmin: z.preprocess((val) => {
-    if (val === 'true') {
-      return true
-    }
-    if (val === 'false') {
-      return false
-    }
-    return val
-  }, z.boolean().optional()),
+  isAdmin: z.preprocess(strToBool, z.boolean().optional()),
 })
 
-export const handler: Handlers<unknown, State> = {
-  async POST(req, ctx) {
+export const userCreateProcedure = t.procedure
+  .input(createSchema)
+  .mutation(({ ctx, input }) => {
     const { user, db } = ctx.state
-    const userIsAdmin = user?.isAdmin ?? false
-
-    if (!userIsAdmin && getSettings(db).signup === 'disable') {
-      return redirect('/error?message=Signup disabled')
+    if (user?.isAdmin !== true && getSettings(db).signup === 'disable') {
+      throw new TRPCError({ code: 'FORBIDDEN', message: 'Signup disabled' })
     }
-
-    const newUser = await req
-      .formData()
-      .then(
-        (formData) => Object.fromEntries(formData.entries()) as unknown as User
-      )
-      .then(({ id, password, name, isAdmin }) => ({
-        id,
-        password: hash(password),
-        name: name ?? '',
-        isAdmin: userIsAdmin && isAdmin,
-      }))
-
-    const users = db.queryEntries<User>('SELECT * FROM users WHERE id = ?', [
-      newUser.id,
-    ])
-    if (users.length !== 0) {
-      return redirect('/error?message=Id exists')
+    if (user?.isAdmin !== true && input.isAdmin === true) {
+      throw new TRPCError({ code: 'FORBIDDEN', message: 'Unauthorized' })
     }
+    try {
+      repo.user.create({ data: input })
+    } catch (error) {
+      if (
+        error instanceof SqliteError &&
+        error.message.startsWith('UNIQUE constraint failed')
+      ) {
+        throw new TRPCError({ code: 'BAD_REQUEST', message: 'Id exists' })
+      }
+      throw error
+    }
+  })
 
-    db.queryEntries(
-      `INSERT INTO users VALUES (:id, :password, :name, :isAdmin)`,
-      newUser
-    )
-    return redirect(userIsAdmin ? '/settings' : '/login')
-  },
-
+export const handler: Handlers<unknown, State> = {
   async PUT(req, ctx) {
     const { user } = ctx.state
     const { id, isAdmin } = user

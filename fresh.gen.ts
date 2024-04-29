@@ -20,6 +20,7 @@ import * as $settings_convert from "./routes/settings/convert.ts";
 import * as $settings_index from "./routes/settings/index.tsx";
 import * as $settings_password from "./routes/settings/password.ts";
 import * as $signup from "./routes/signup.tsx";
+import * as $trpc_procedure_ from "./routes/trpc/[procedure].ts";
 import * as $user_index from "./routes/user/index.ts";
 import * as $AlbumInfo from "./islands/AlbumInfo.tsx";
 import * as $Albums from "./islands/Albums.tsx";
@@ -29,6 +30,7 @@ import * as $ImageInfo from "./islands/ImageInfo.tsx";
 import * as $ImageLink from "./islands/ImageLink.tsx";
 import * as $Images from "./islands/Images.tsx";
 import * as $NewAlbum from "./islands/NewAlbum.tsx";
+import * as $SignupSubmit from "./islands/SignupSubmit.tsx";
 import * as $Theme from "./islands/Theme.tsx";
 import * as $UploadImage from "./islands/UploadImage.tsx";
 import * as $UserManager from "./islands/UserManager.tsx";
@@ -55,6 +57,7 @@ const manifest = {
     "./routes/settings/index.tsx": $settings_index,
     "./routes/settings/password.ts": $settings_password,
     "./routes/signup.tsx": $signup,
+    "./routes/trpc/[procedure].ts": $trpc_procedure_,
     "./routes/user/index.ts": $user_index,
   },
   islands: {
@@ -66,6 +69,7 @@ const manifest = {
     "./islands/ImageLink.tsx": $ImageLink,
     "./islands/Images.tsx": $Images,
     "./islands/NewAlbum.tsx": $NewAlbum,
+    "./islands/SignupSubmit.tsx": $SignupSubmit,
     "./islands/Theme.tsx": $Theme,
     "./islands/UploadImage.tsx": $UploadImage,
     "./islands/UserManager.tsx": $UserManager,
